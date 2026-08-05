@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robyn-framework"
+version = "1.0.0"
+description = "Autonomous AI Agent & EVM Action Engine for Robinhood Chain"
+readme = "README.md"
+authors = [{ name = "Robyn Hood", email = "robynhooood99@gmail.com" }]
+license = { text = "Apache-2.0" }
+keywords = ["ai-agent", "robinhood-chain", "arbitrum-orbit", "rwa", "defi", "trading", "hermes", "elizaos"]
+dependencies = [
+    "web3>=6.15.0",
+    "requests>=2.31.0",
+    "pydantic>=2.5.0",
+    "rich>=13.7.0",
+    "python-dotenv>=1.0.0"
+]
+
+[project.scripts]
+robyn = "robyn.cli:main"
