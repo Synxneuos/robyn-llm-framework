@@ -9,8 +9,7 @@
 [![Chain: Robinhood L2](https://img.shields.io/badge/Network-Robinhood%20Chain%20(Orbit)-00C805.svg)](https://robinhood.com)
 [![HuggingFace Model](https://img.shields.io/badge/Model-robynhooood%2FRobyn--Agent-orange.svg)](https://huggingface.co/robynhooood/Robyn-Agent)
 [![Latency: Sub--100ms](https://img.shields.io/badge/Latency-100ms%20Block%20Ready-brightgreen.svg)](#flash-arbitrage)
-[![Standard: Hermes Tool Calling](https://img.shields.io/badge/Standard-Hermes%20JSON%20Tools-ff69b4.svg)](#hermes-tool-calling)
-[![Framework: ElizaOS Native](https://img.shields.io/badge/Framework-ElizaOS%20Compatible-blue.svg)](#elizaos-agent-integration)
+[![Architecture: Robyn-Neural](https://img.shields.io/badge/Architecture-Robyn--0.5B-blueviolet.svg)](#overview)
 
 </div>
 
@@ -170,15 +169,6 @@ python -m robyn.cli arb --pair CASHCAT/ETH
 python -m robyn.cli prompt "Robyn, check if NVDA is trending and rebalance my vault"
 ```
 
----
-
-## 🤖 ElizaOS Integration
-
-Robyn is 100% compatible with ElizaOS. You can run her directly as an autonomous agent:
-
-```bash
-npx eliza start --characters ./characters/robyn.json
-```
 
 ---
 
