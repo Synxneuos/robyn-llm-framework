@@ -8,6 +8,9 @@ from robyn.modules.flash_arbitrage import FlashArbitrageEngine
 from robyn.modules.portfolio_manager import AIPortfolioManager
 from robyn.modules.hype_oracle import OnChainHypeOracle
 from robyn.modules.hyper_speed_engine import HyperSpeedEngine
+from robyn.modules.clm_vault import CLMVaultManager
+from robyn.modules.verifiable_proofs import VerifiableAuditLogger
+from robyn.modules.telegram_sniper import TelegramSniperBot
 
 
 def main():
@@ -48,6 +51,17 @@ def main():
     # 6. Benchmark Command (Faster & Cheaper than Solana)
     subparsers.add_parser("benchmark", help="Compare Robinhood Orbit HyperSpeed vs Solana Mainnet")
 
+    # 7. CLM Command (Concentrated Liquidity)
+    clm_p = subparsers.add_parser("clm", help="Analyze and re-center Uniswap V3 concentrated liquidity")
+    clm_p.add_argument("--pool", type=str, default="NVDA/USDC", help="Pool pair")
+
+    # 8. Verifiable Proof Command
+    proof_p = subparsers.add_parser("proof", help="Anchor cryptographic audit receipt for an action")
+    proof_p.add_argument("--action", type=str, default="AUTONOMOUS_HEDGE", help="Action type")
+
+    # 9. Telegram Bot Simulator Command
+    subparsers.add_parser("telegram", help="Start interactive Telegram trading sniper")
+
     args = parser.parse_args()
 
     # Initialize Agent and register modules
@@ -58,6 +72,9 @@ def main():
     agent.register_module("portfolio", AIPortfolioManager(agent.wallet))
     agent.register_module("oracle", OnChainHypeOracle())
     agent.register_module("hyperspeed", HyperSpeedEngine(agent.wallet))
+    agent.register_module("clm", CLMVaultManager(agent.wallet))
+    agent.register_module("audit", VerifiableAuditLogger(agent.wallet))
+    agent.register_module("telegram", TelegramSniperBot(agent.wallet))
 
     if args.command == "status":
         print(json.dumps(agent.execute_prompt("check status"), indent=2))
@@ -65,6 +82,12 @@ def main():
         print(json.dumps(agent.execute_prompt(args.text), indent=2))
     elif args.command == "benchmark":
         print(json.dumps(agent.modules["hyperspeed"].get_benchmark_comparison(), indent=2))
+    elif args.command == "clm":
+        print(json.dumps(agent.modules["clm"].execute_auto_recenter(args.pool), indent=2))
+    elif args.command == "proof":
+        print(json.dumps(agent.modules["audit"].generate_action_proof(args.action, "CLI invocation", {"action": args.action}), indent=2))
+    elif args.command == "telegram":
+        agent.modules["telegram"].start_polling_loop()
     elif args.command == "hedge":
         hedger = agent.modules["hedger"]
         print(json.dumps(hedger.create_rule(args.meme, args.stock, args.pump, args.percent), indent=2))

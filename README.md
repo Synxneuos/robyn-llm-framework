@@ -83,7 +83,9 @@ robyn-llm-framework/
 ├── contracts/
 │   ├── EquiMemeToken.sol         # Stock-backed token smart contract
 │   ├── MemeToStockVault.sol      # Autonomous profit hedging vault contract
-│   └── HyperSpeedFactory.sol     # Minimal proxy & zero-approval DEX engine
+│   ├── HyperSpeedFactory.sol     # Minimal proxy & zero-approval DEX engine
+│   ├── RobynCLMVault.sol         # Autonomous Concentrated Liquidity (CLM) vault
+│   └── RobynTradeProofOracle.sol # Verifiable on-chain action audit registry
 ├── robyn/
 │   ├── chain/
 │   │   ├── client.py             # Robinhood Orbit RPC & telemetry client
@@ -98,11 +100,17 @@ robyn-llm-framework/
 │   │   ├── flash_arbitrage.py    # 100ms flash arbitrage engine
 │   │   ├── portfolio_manager.py  # AI hedge fund manager
 │   │   ├── hype_oracle.py        # On-chain sentiment oracle
-│   │   └── hyper_speed_engine.py # Sub-100ms launcher & trader (<$0.0009)
+│   │   ├── hyper_speed_engine.py # Sub-100ms launcher & trader (<$0.0009)
+│   │   ├── clm_vault.py          # AI Uniswap V3 concentrated liquidity rebalancer
+│   │   ├── verifiable_proofs.py  # Cryptographic decision audit receipts
+│   │   └── telegram_sniper.py    # Fast Telegram sniper & trading bot
 │   ├── cli.py                    # Interactive terminal CLI
 │   └── config.py                 # Configuration & environment variables
 ├── examples/
 │   ├── benchmark_solana_vs_robinhood.py # Head-to-head performance benchmark
+│   ├── demo_clm_auto_yield.py           # Concentrated liquidity auto-yield demo
+│   ├── demo_verifiable_audit_proofs.py  # On-chain cryptographic receipts demo
+│   ├── demo_telegram_bot_simulator.py   # Telegram sniper bot simulator
 │   ├── demo_hedge_vault.py
 │   ├── demo_launch_stock_backed_meme.py
 │   ├── demo_100ms_arbitrage.py
