@@ -1,16 +1,20 @@
 ﻿import React, { useState, useEffect } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useChainId } from 'wagmi'
+import { useAccount } from 'wagmi'
+import HeroBanner from '../components/HeroBanner'
+import DexScreenerTerminal from '../components/DexScreenerTerminal'
+import CollateralCalculator from '../components/CollateralCalculator'
 import VaultDashboard from '../components/VaultDashboard'
 
 export default function App() {
   const { isConnected, address } = useAccount()
-  const chainId = useChainId()
   const [blockNumber, setBlockNumber] = useState<number | null>(null)
-  const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.38')
+  const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
+  const [calcAmount, setCalcAmount] = useState<string>('')
+  const [calcDuration, setCalcDuration] = useState<number>(30)
 
+  // Fetch real on-chain block number & gas price from Robinhood RPC
   useEffect(() => {
-    // Fetch real live block number and gas price from Robinhood RPC
     const fetchRpcStats = async () => {
       try {
         const res = await fetch('https://rpc.mainnet.chain.robinhood.com', {
@@ -34,58 +38,83 @@ export default function App() {
     }
 
     fetchRpcStats()
-    const interval = setInterval(fetchRpcStats, 6000)
+    const interval = setInterval(fetchRpcStats, 5000)
     return () => clearInterval(interval)
   }, [])
 
+  const handleApplyCalculator = (amount: string, days: number) => {
+    setCalcAmount(amount)
+    setCalcDuration(days)
+    const el = document.getElementById('vault-actions')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-green-500 selection:text-black">
-      {/* Top Telemetry Ticker */}
-      <div className="bg-emerald-950/60 border-b border-emerald-500/20 text-xs py-1.5 px-4 text-emerald-300 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="font-semibold tracking-wide">ROBINHOOD CHAIN MAINNET (ID: 4663)</span>
-          <span className="text-emerald-500/50">|</span>
-          <span>Block: {blockNumber ? `#${blockNumber.toLocaleString()}` : 'Connecting...'}</span>
-          <span className="text-emerald-500/50">|</span>
-          <span>Gas: {gasPriceGwei} Gwei</span>
-          <span className="text-emerald-500/50">|</span>
-          <span>Speed: 100ms Blocktime (Nitro L2)</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://robinhoodchain.blockscout.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline flex items-center gap-1 text-emerald-300"
-          >
-            Blockscout Explorer ↗
-          </a>
+    <div className="min-h-screen flex flex-col justify-between bg-[#040608] text-white selection:bg-green-500 selection:text-black">
+      {/* 1. Live Robinhood Nitro L2 Telemetry Ticker */}
+      <div className="bg-[#020d04] border-b border-green-500/20 text-xs py-2 px-4 text-green-300">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="font-extrabold tracking-wider text-white">ROBYN OS - FW</span>
+            <span className="text-green-500/40">|</span>
+            <span className="font-semibold text-green-400">ROBINHOOD CHAIN (ID: 4663)</span>
+            <span className="text-green-500/40">|</span>
+            <span className="font-mono">Block: {blockNumber ? `#${blockNumber.toLocaleString()}` : 'Connecting RPC...'}</span>
+            <span className="text-green-500/40">|</span>
+            <span className="font-mono">Gas: {gasPriceGwei} Gwei</span>
+            <span className="text-green-500/40 hidden md:inline">|</span>
+            <span className="text-gray-300 hidden md:inline">Latency: <strong className="text-green-400">100ms Orbit Nitro</strong></span>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px]">
+            <a
+              href="https://robinhoodchain.blockscout.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-400 hover:text-green-300 flex items-center gap-1 font-semibold underline"
+            >
+              Blockscout Explorer ↗
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* Main Header */}
-      <header className="border-b border-white/10 backdrop-blur-md sticky top-0 z-50 bg-[#050814]/80">
+      {/* 2. Top Navigation Bar */}
+      <header className="border-b border-white/10 backdrop-blur-xl sticky top-0 z-50 bg-[#040608]/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center font-black text-black text-xl shadow-lg shadow-green-500/20">
-              R
+            {/* Robinhood Feather Emblem */}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center p-2 shadow-lg shadow-green-500/30">
+              <svg className="w-full h-full text-black fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L4 10h5v10h6V10h5L12 2z" />
+              </svg>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-white text-lg tracking-tight">Robyn Collateral Vault</h1>
-                <span className="bg-green-500/20 text-green-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-green-500/30">
-                  TradFi Bridge
+                <h1 className="font-black text-white text-xl tracking-tight leading-none">
+                  Robyn OS <span className="text-green-400 font-extrabold">- FW</span>
+                </h1>
+                <span className="bg-green-500/20 text-green-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-green-500/40 tracking-wider">
+                  OFFICIAL
                 </span>
               </div>
-              <p className="text-xs text-gray-400">Equity Collateral · Streaming Dividends</p>
+              <p className="text-[11px] text-gray-400 font-medium">
+                Wall Street Collateral · Algorithmic AI Agency
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-300">
+              <a href="#vault-actions" className="hover:text-green-400 transition">Staking Vault</a>
+              <a href="#dex-terminal" className="hover:text-green-400 transition">$ROBYN DexScreener</a>
+              <a href="#calculator" className="hover:text-green-400 transition">Calculator</a>
+              <a href="#architecture" className="hover:text-green-400 transition">Ecosystem</a>
+            </nav>
             <ConnectButton
               showBalance={{ smallScreen: false, largeScreen: true }}
               chainStatus="icon"
@@ -95,134 +124,108 @@ export default function App() {
         </div>
       </header>
 
-      {/* Hero & App Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+      {/* 3. Main Dashboard Body */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-12">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/10 via-green-500/20 to-emerald-500/10 border border-green-500/30 rounded-full px-4 py-1.5 text-green-400 text-xs font-semibold mb-4 tracking-wide shadow-sm">
-            <span>Wall Street Equity Meets On-Chain Liquidity</span>
+        <HeroBanner />
+
+        {/* DexScreener Live Terminal Section */}
+        <section id="dex-terminal">
+          <DexScreenerTerminal />
+        </section>
+
+        {/* Collateral & Yield Calculator */}
+        <section id="calculator">
+          <CollateralCalculator onSelectAmount={handleApplyCalculator} />
+        </section>
+
+        {/* Live Staking & Dividend Vault */}
+        <section>
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-2xl font-black text-white tracking-tight">
+                Robyn Autonomous Collateral Vault
+              </h2>
+              <p className="text-xs text-gray-400">
+                Lock principal to mint weighted shares, secure $NVDA backing, and claim streaming stock dividends
+              </p>
+            </div>
+            {!isConnected && (
+              <span className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 px-3 py-1 rounded-lg">
+                💡 Connect MetaMask or Phantom to execute on-chain
+              </span>
+            )}
           </div>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-            Lock On-Chain Liquidity.<br />
-            <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
-              Earn Real US Equity Collateral.
+          <VaultDashboard presetAmount={calcAmount} presetDuration={calcDuration} />
+        </section>
+
+        {/* Architecture & 5 Breakthrough Modules Showcase */}
+        <section id="architecture" className="border-t border-white/10 pt-12">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              Autonomous Agency
             </span>
-          </h2>
-          <p className="text-gray-400 text-base sm:text-lg leading-relaxed">
-            Bridging TradFi equity collateral with degen liquidity on Robinhood Chain. Lock ETH or meme tokens into the autonomous collateral pool to back your position with <strong className="text-white">$NVDA</strong> shares and claim streaming Wall Street cash dividends.
-          </p>
-        </div>
-
-        {/* Feature Stats Pills */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-10">
-          <div className="card-bg p-3.5 rounded-xl border border-white/10 text-center">
-            <div className="text-xs text-gray-400 uppercase font-semibold">Treasury Backing</div>
-            <div className="text-xl font-bold text-white mt-0.5">$1,425,000</div>
-            <div className="text-[11px] text-green-400 font-medium">11,445 Real NVDA Shares</div>
-          </div>
-          <div className="card-bg p-3.5 rounded-xl border border-white/10 text-center">
-            <div className="text-xs text-gray-400 uppercase font-semibold">Dividends Streamed</div>
-            <div className="text-xl font-bold text-emerald-400 mt-0.5">$46,920</div>
-            <div className="text-[11px] text-gray-400">Quarterly Equity Yield</div>
-          </div>
-          <div className="card-bg p-3.5 rounded-xl border border-white/10 text-center">
-            <div className="text-xs text-gray-400 uppercase font-semibold">Max Lock APY</div>
-            <div className="text-xl font-bold text-green-400 mt-0.5">12.0%</div>
-            <div className="text-[11px] text-gray-400">2.5x Duration Multiplier</div>
-          </div>
-          <div className="card-bg p-3.5 rounded-xl border border-white/10 text-center">
-            <div className="text-xs text-gray-400 uppercase font-semibold">Block Time</div>
-            <div className="text-xl font-bold text-white mt-0.5">100 ms</div>
-            <div className="text-[11px] text-emerald-400 font-medium">Robinhood Nitro L2</div>
-          </div>
-        </div>
-
-        {/* Wallet Connection Gate */}
-        {!isConnected ? (
-          <div className="card-bg rounded-2xl p-8 sm:p-12 max-w-xl mx-auto text-center border border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none" />
-            <div className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner shadow-green-500/20">
-              ⚡
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Connect Your Web3 Wallet</h3>
-            <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
-              Connect MetaMask, Phantom, Coinbase Wallet, or any WalletConnect app on Robinhood Chain to manage your collateral positions and claim dividends.
+            <h3 className="text-3xl font-black text-white tracking-tight mt-3">
+              The Robyn OS - FW Architectural Engine
+            </h3>
+            <p className="text-gray-400 text-sm mt-2">
+              Engineered natively for Robinhood Chain Arbitrum Orbit with 100ms sub-second latency and zero gas overhead.
             </p>
-            <div className="flex justify-center">
-              <ConnectButton />
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-3 gap-2 text-xs text-gray-400">
-              <div>
-                <span className="block font-bold text-white mb-1">🦊 MetaMask</span>
-                Injected & Extension
-              </div>
-              <div>
-                <span className="block font-bold text-white mb-1">👻 Phantom</span>
-                Multi-chain EVM
-              </div>
-              <div>
-                <span className="block font-bold text-white mb-1">🔗 WalletConnect</span>
-                300+ Mobile Wallets
-              </div>
-            </div>
           </div>
-        ) : (
-          <VaultDashboard />
-        )}
 
-        {/* Architecture Flow */}
-        <div className="mt-16 border-t border-white/10 pt-12">
-          <h3 className="text-center font-bold text-xl text-white mb-8">
-            How The Robyn TradFi Collateral Engine Operates
-          </h3>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="card-bg p-6 rounded-xl border border-white/10">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold mb-4">
-                1
+            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                ⚡
               </div>
-              <h4 className="font-bold text-white text-base mb-2">Lock Liquidity</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Stakers deposit ETH or Robinhood Chain tokens into the smart contract. Choose a duration tier (7 to 365 days) to earn up to 2.5x weighted shares in the treasury pool.
+              <h4 className="font-extrabold text-white text-base mb-2">HyperSpeed Engine (&lt;100ms)</h4>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                Faster execution than Solana. Leverages direct Arbitrum Nitro WebSocket feeds with pre-compiled bytecode routing for instant sub-second transactions.
               </p>
             </div>
 
-            <div className="card-bg p-6 rounded-xl border border-white/10">
-              <div className="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400 font-bold mb-4">
-                2
+            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                🏛️
               </div>
-              <h4 className="font-bold text-white text-base mb-2">Autonomous Equity Backing</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                The Robyn Autonomous Agent periodically takes profits from algorithmic volume and acquires tokenized Wall Street stocks ($NVDA, $AAPL) held directly in the transparent on-chain treasury.
+              <h4 className="font-extrabold text-white text-base mb-2">TradFi Equity Hedging</h4>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                Autonomously converts degen meme profits into tokenized US equities ($NVDA, $AAPL) held directly in transparent on-chain custody.
               </p>
             </div>
 
-            <div className="card-bg p-6 rounded-xl border border-white/10">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold mb-4">
-                3
+            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                💎
               </div>
-              <h4 className="font-bold text-white text-base mb-2">Streaming Dividends</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Quarterly dividends and yield generated by the equities are autonomously streamed into the vault contract. Users can claim their share directly to their wallet in real-time.
+              <h4 className="font-extrabold text-white text-base mb-2">CLM Auto-Yield Vault</h4>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                Concentrated Liquidity Manager automatically rebalances tick ranges around Robinhood orderbook volume, maximizing fee yields for stakers.
               </p>
             </div>
           </div>
-        </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#050814]/90 py-6 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500"></span>
-            <span>Robyn Collateral Vault · Robinhood Chain Mainnet (4663)</span>
+      {/* 4. Footer */}
+      <footer className="border-t border-white/10 bg-[#020503] py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-lg bg-green-500 flex items-center justify-center p-1">
+              <svg className="w-full h-full text-black fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L4 10h5v10h6V10h5L12 2z" />
+              </svg>
+            </div>
+            <span className="font-bold text-white">Robyn OS - FW</span>
+            <span>· Built on Robinhood Chain (Arbitrum Orbit)</span>
           </div>
+
           <div className="flex items-center gap-6">
             <a
               href="https://robinhoodchain.blockscout.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-400 transition-colors"
+              className="hover:text-green-400 transition"
             >
               Blockscout
             </a>
@@ -230,7 +233,7 @@ export default function App() {
               href="https://rpc.mainnet.chain.robinhood.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-400 transition-colors"
+              className="hover:text-green-400 transition"
             >
               RPC Endpoint
             </a>
@@ -238,9 +241,17 @@ export default function App() {
               href="https://github.com/robynhood-fw/robyn-llm-framework"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-400 transition-colors"
+              className="hover:text-green-400 transition"
             >
-              GitHub Repository
+              GitHub (Robyn FW)
+            </a>
+            <a
+              href="https://huggingface.co/robynhooood/Robyn-Agent"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-green-400 transition"
+            >
+              Hugging Face Model
             </a>
           </div>
         </div>
