@@ -4,84 +4,85 @@ import React, { useState } from 'react'
 
 const MODULES = [
   {
-    id: 'hedging',
-    icon: '🛡️',
-    title: 'Meme-to-Stock Autonomous Hedging',
-    tag: 'RWA HEDGING',
-    contract: 'contracts/MemeToStockVault.sol',
-    summary: 'Autonomously sweeps degen meme token trading profits into tokenized US tech equities ($NVDA, $AAPL) on Robinhood Chain.',
-    problem: '95% of meme traders round-trip their 10x–50x gains because taking profit manually is psychologically difficult and slow.',
-    solution: 'User sets an automated directive: "When my meme token pumps 2x on Pons, autonomously sweep 30% of profits into tokenized Nvidia ($NVDA)". The agent executes automatically.',
-    code: `// Python SDK: Auto-Hedge Rule
-agent.register_hedging_rule(
-    token_in="0xMemeTokenAddress...",
-    trigger_gain_pct=100, // 2x pump
-    take_profit_pct=30,   // sweep 30%
-    target_rwa="NVDA"     // tokenized Nvidia
-)`,
-  },
-  {
-    id: 'equimeme',
-    icon: '🏛️',
-    title: 'Stock-Backed Meme Launchpad ("Equi-Meme")',
-    tag: 'FLOOR PROTECTION',
-    contract: 'contracts/EquiMemeToken.sol',
-    summary: 'Launches community tokens with an unruggable, real-world asset collateral floor price guaranteed by US equity reserves.',
-    problem: 'Thousands of meme tokens launch daily with zero underlying backing and collapse to zero when momentum fades.',
-    solution: 'Equi-Meme locks a fixed 10% of bonding curve capital directly into tokenized US equities in on-chain escrow, creating a mathematical floor price.',
-    code: `// Python SDK: Launch Equi-Meme Token
-token = agent.launch_equi_meme(
-    name="Robyn AI",
-    symbol="ROBYN",
-    initial_supply=1_000_000_000,
-    equity_backing_asset="NVDA",
-    equity_reserve_bps=1000 // 10%
-)`,
+    id: 'agent',
+    icon: '🧠',
+    title: 'Autonomous EVM Execution Engine',
+    tag: 'CORE RUNTIME',
+    contract: 'robyn/core/agent.py',
+    summary: 'Autonomous coordination loop that translates natural language directives and quantitative market signals into validated EVM transactions.',
+    capability: 'Hermes JSON tool calling, automated parameter validation, simulation before broadcast, and multi-step on-chain coordination.',
+    architecture: 'Connects directly to Robinhood Nitro Sequencer with sub-20ms inference and zero gas waste.',
+    code: `# Python SDK: Autonomous EVM Agent
+agent = RobynAgent(
+    model="robynhooood/Robyn-Agent",
+    chain_id=4663, # Robinhood Chain
+    autonomous=True
+)
+
+# Start autonomous execution loop
+agent.run_autonomous_cycle()`,
   },
   {
     id: 'arbitrage',
     icon: '⚡',
-    title: '100ms Flash-Arbitrage Swarm Engine',
+    title: 'Sub-100ms Flash Arbitrage Swarms',
     tag: 'SUB-SECOND ARB',
     contract: 'robyn/modules/flash_arbitrage.py',
-    summary: 'Executes atomic cross-DEX arbitrage in sub-100ms intervals between Pons AMM and Uniswap V3 on Robinhood Chain.',
-    problem: 'Liquidity fragmentation between AMMs creates price discrepancies that manual traders cannot capture fast enough.',
-    solution: 'Robyn monitors Arbitrum Nitro WebSocket feeds with pre-compiled bytecode routing, executing atomic flash-swaps with zero human delay.',
-    code: `// Python SDK: Flash Arbitrage Monitor
+    summary: 'High-frequency atomic cross-DEX routing optimized for Robinhood Chain Arbitrum Orbit 100ms blocks.',
+    capability: 'Taps into low-latency WebSocket sequencer feeds to capture micro-second liquidity disparities between AMMs atomically.',
+    architecture: 'Sub-100ms block inclusion ensures zero front-running and MEV-resistant settlement.',
+    code: `# Python SDK: Flash Arbitrage Monitor
 agent.start_flash_arbitrage_swarm(
-    pair=("ROBYN", "WETH"),
-    min_profit_bps=25,
+    target_pairs=["ROBYN/ETH", "USDC/ETH"],
+    min_profit_bps=20,
     max_latency_ms=100
 )`,
   },
   {
-    id: 'hedgefund',
-    icon: '💼',
-    title: 'ERC-4337 AI Portfolio Manager & Session Keys',
-    tag: 'SMART ACCOUNTS',
+    id: 'clm',
+    icon: '💎',
+    title: 'Concentrated Liquidity Manager (CLM)',
+    tag: 'DYNAMIC LIQUIDITY',
+    contract: 'contracts/RobynCLMVault.sol',
+    summary: 'Algorithmic liquidity management that dynamically adjusts price tick bounds around Robinhood retail orderbook volume.',
+    capability: 'Continuously rebalances LP ranges to capture maximum trading fee velocity while minimizing impermanent loss.',
+    architecture: 'Automated on-chain rebalancing without manual LP intervention.',
+    code: `# Python SDK: Dynamic CLM Tick Optimizer
+clm = agent.get_clm_module(pool="0xRobinhoodPool...")
+clm.rebalance_ticks(
+    range_width_bps=200,
+    auto_compound=True
+)`,
+  },
+  {
+    id: 'accounts',
+    icon: '🛡️',
+    title: 'ERC-4337 Smart Accounts & Session Keys',
+    tag: 'NON-CUSTODIAL',
     contract: 'robyn/chain/wallet.py',
-    summary: 'Non-custodial algorithmic portfolio management using account abstraction session keys on Robinhood Orbit.',
-    problem: 'Giving full private keys to automated bots creates catastrophic security risks.',
-    solution: 'Users grant restricted session keys to Robyn with strict spending limits and whitelisted contracts, maintaining 100% self-custody.',
-    code: `// Python SDK: Session Key Portfolio Rebalance
-agent.set_portfolio_target({
-    "RWAs (NVDA/AAPL/SPY)": 0.50,
-    "Bluechip DeFi (ETH/USDC)": 0.30,
-    "Momentum Memes": 0.20
-})`,
+    summary: 'Non-custodial agent delegation using account abstraction session keys on Robinhood Orbit.',
+    capability: 'Users grant restricted session keys with strict spending limits, contract whitelists, and expiry timestamps.',
+    architecture: 'Maintains 100% self-custody while enabling 24/7 autonomous agent execution.',
+    code: `# Python SDK: Create Restricted Session Key
+session = agent.create_session_key(
+    spending_limit_eth=0.5,
+    valid_duration_hours=24,
+    whitelisted_contracts=["0xVault...", "0xRouter..."]
+)`,
   },
   {
     id: 'oracle',
     icon: '📡',
-    title: 'On-Chain Hype & Sentiment Oracle',
-    tag: 'VERIFIABLE PROOF',
+    title: 'Verifiable State & Inference Oracle',
+    tag: 'CRYPTOGRAPHIC AUDIT',
     contract: 'contracts/RobynTradeProofOracle.sol',
-    summary: 'Computes real-time social sentiment scores and publishes verifiable cryptographic proofs directly to smart contracts.',
-    problem: 'DeFi protocols rely on centralized Web2 APIs for social metrics, making them vulnerable to single points of failure.',
-    solution: 'Robyn generates cryptographic trade proof receipts and commits sentiment indices (0–100) on-chain for dynamic lending and liquidation triggers.',
-    code: `// Python SDK: Verifiable State Oracle
-sentiment_score = agent.get_on_chain_sentiment("ROBYN")
-print(f"Verified On-Chain Hype Score: {sentiment_score}/100")`,
+    summary: 'Generates on-chain cryptographic receipts and verifiable audit proofs for all autonomous actions.',
+    capability: 'Commits verifiable inference hashes and trade receipts directly to smart contracts without centralized API trust.',
+    architecture: 'Decentralized verification guarantees transparent on-chain AI outputs.',
+    code: `# Python SDK: Verifiable State Verification
+receipt = agent.get_latest_execution_proof()
+print(f"Proof Hash: {receipt.proof_hash}")
+print(f"Block Height: #{receipt.block_number}")`,
   },
 ]
 
@@ -94,13 +95,13 @@ export default function FrameworkModules() {
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto">
         <span className="bg-[#00C805]/10 border border-[#00C805]/30 text-[#00C805] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
-          Breakthrough Capabilities
+          Framework Primitives
         </span>
         <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-3">
           5 Core AI Framework Modules
         </h2>
         <p className="text-gray-400 text-xs sm:text-sm mt-2">
-          Pioneering autonomous EVM intelligence natively integrated with Robinhood Chain's financial primitives.
+          Pioneering autonomous EVM intelligence natively integrated with Robinhood Chain's financial infrastructure.
         </p>
       </div>
 
@@ -126,7 +127,7 @@ export default function FrameworkModules() {
       {/* Active Module Detail Card */}
       <div className="rounded-3xl bg-[#090B0E] border border-white/10 p-6 sm:p-10 shadow-2xl">
         <div className="grid lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Problem, Solution & Contract */}
+          {/* Left Column: Details */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-3">
               <span className="w-12 h-12 rounded-2xl bg-[#00C805]/10 border border-[#00C805]/30 flex items-center justify-center text-2xl">
@@ -144,24 +145,24 @@ export default function FrameworkModules() {
 
             <p className="text-gray-300 text-sm leading-relaxed">{currentModule.summary}</p>
 
-            <div className="space-y-4 pt-1">
+            <div className="space-y-3 pt-1">
               <div className="p-4 bg-black/60 rounded-xl border border-white/10 space-y-1">
-                <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider block">
-                  The Problem in Web3:
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                  Core AI Capability:
                 </span>
-                <p className="text-gray-400 text-xs leading-relaxed">{currentModule.problem}</p>
+                <p className="text-gray-300 text-xs leading-relaxed">{currentModule.capability}</p>
               </div>
 
               <div className="p-4 bg-black/60 rounded-xl border border-[#00C805]/20 space-y-1">
                 <span className="text-[10px] font-bold text-[#00C805] uppercase tracking-wider block">
-                  Robyn's Autonomous Solution:
+                  Network Architecture:
                 </span>
-                <p className="text-gray-300 text-xs leading-relaxed">{currentModule.solution}</p>
+                <p className="text-gray-300 text-xs leading-relaxed">{currentModule.architecture}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-gray-400 pt-2 font-mono">
-              <span>Source File:</span>
+              <span>Module Source:</span>
               <span className="text-[#00C805] bg-white/5 px-2.5 py-1 rounded border border-white/10">
                 {currentModule.contract}
               </span>

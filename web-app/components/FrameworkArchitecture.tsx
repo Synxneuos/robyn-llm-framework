@@ -7,16 +7,16 @@ export default function FrameworkArchitecture() {
     {
       step: '01',
       title: 'Intent & Client Ingestion',
-      desc: 'Accepts natural language commands via Web3 dApps, Telegram, Discord, or Python API.',
+      desc: 'Accepts natural language directives via Web3 dApps, Telegram bots, or Python SDK.',
       tag: 'NLP INGESTION',
-      code: 'user: "Sweep 30% meme profits to NVDA"',
+      code: 'user: "Rebalance LP ticks & execute arbitrage"',
     },
     {
       step: '02',
       title: 'Robyn Neural LLM Brain',
-      desc: 'Parses intent into structured Hermes <tool_call> JSON format with strict safety constraints.',
+      desc: 'Parses intent into structured Hermes <tool_call> JSON format with strict safety validation.',
       tag: 'HERMES PARSER',
-      code: '<tool_call> {"name": "hedge_rwa", "args": {...}}',
+      code: '<tool_call> {"name": "execute_clm_rebalance", "args": {...}}',
     },
     {
       step: '03',
@@ -28,7 +28,7 @@ export default function FrameworkArchitecture() {
     {
       step: '04',
       title: 'On-Chain Settlement',
-      desc: 'Atomic execution on Robinhood Chain with tokenized equity escrow and cryptographic audit log.',
+      desc: 'Atomic execution on Robinhood Chain with sub-second block inclusion and cryptographic receipts.',
       tag: 'ORBIT SETTLEMENT',
       code: 'Block #54,345,100 · Latency: 18ms · 0.36 Gwei',
     },
@@ -44,7 +44,7 @@ export default function FrameworkArchitecture() {
     {
       title: 'Robyn Neural Model',
       val: '0.5B Params',
-      desc: 'Lightweight, ultra-fast tool-calling model optimized for financial and EVM execution.',
+      desc: 'Lightweight, ultra-fast tool-calling model optimized for on-chain EVM execution.',
       icon: '🧠',
     },
     {
@@ -54,10 +54,10 @@ export default function FrameworkArchitecture() {
       icon: '⛽',
     },
     {
-      title: 'TradFi Equity Collateral',
-      val: '$NVDA / $AAPL',
-      desc: 'Seamlessly interacts with tokenized US equities and degen liquidity on Robinhood Chain.',
-      icon: '🏛️',
+      title: 'EVM Interoperability',
+      val: 'Orbit Nitro',
+      desc: 'Natively compatible with all DEX AMMs, smart contracts, and tokens on Robinhood Chain.',
+      icon: '🌐',
     },
   ]
 
