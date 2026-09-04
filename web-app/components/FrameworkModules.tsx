@@ -2,197 +2,169 @@
 
 import React, { useState } from 'react'
 
-const MODULES = [
-  {
-    id: 'agent',
-    icon: '🧠',
-    title: 'Autonomous EVM Execution Engine',
-    tag: 'CORE RUNTIME',
-    contract: 'robyn/core/agent.py',
-    summary: 'Autonomous coordination loop that translates natural language directives and quantitative market signals into validated EVM transactions.',
-    capability: 'Hermes JSON tool calling, automated parameter validation, simulation before broadcast, and multi-step on-chain coordination.',
-    architecture: 'Connects directly to Robinhood Nitro Sequencer with sub-20ms inference and zero gas waste.',
-    code: `# Python SDK: Autonomous EVM Agent
-agent = RobynAgent(
-    model="robynhooood/Robyn-Agent",
-    chain_id=4663, # Robinhood Chain
-    autonomous=True
-)
+interface PluginItem {
+  id: string
+  name: string
+  version: string
+  category: string
+  desc: string
+  install: string
+  capabilities: string[]
+  icon: string
+}
 
-# Start autonomous execution loop
-agent.run_autonomous_cycle()`,
+const PLUGINS: PluginItem[] = [
+  {
+    id: 'plugin-robinhood',
+    name: '@robyn-os/plugin-robinhood',
+    version: 'v1.0.0',
+    category: 'CORE / EXECUTION',
+    desc: 'Sub-100ms Arbitrum Orbit Nitro RPC connector, private sequencer bundling, and block stream listeners.',
+    install: 'robyn plugins add @robyn-os/plugin-robinhood',
+    capabilities: ['100ms Orbit Nitro RPC', 'Private Sequencer Bundles', 'Mempool Block Watchers'],
+    icon: '⚡'
   },
   {
-    id: 'arbitrage',
-    icon: '⚡',
-    title: 'Sub-100ms Flash Arbitrage Swarms',
-    tag: 'SUB-SECOND ARB',
-    contract: 'robyn/modules/flash_arbitrage.py',
-    summary: 'High-frequency atomic cross-DEX routing optimized for Robinhood Chain Arbitrum Orbit 100ms blocks.',
-    capability: 'Taps into low-latency WebSocket sequencer feeds to capture micro-second liquidity disparities between AMMs atomically.',
-    architecture: 'Sub-100ms block inclusion ensures zero front-running and MEV-resistant settlement.',
-    code: `# Python SDK: Flash Arbitrage Monitor
-agent.start_flash_arbitrage_swarm(
-    target_pairs=["ROBYN/ETH", "USDC/ETH"],
-    min_profit_bps=20,
-    max_latency_ms=100
-)`,
+    id: 'plugin-evm',
+    name: '@robyn-os/plugin-evm',
+    version: 'v1.0.0',
+    category: 'ACCOUNT ABSTRACTION',
+    desc: 'ERC-4337 smart accounts, autonomous ephemeral session keys, and zero-revert pre-flight simulation.',
+    install: 'robyn plugins add @robyn-os/plugin-evm',
+    capabilities: ['ERC-4337 Session Keys', 'Gas Sponsorship', 'Multi-Call Batching'],
+    icon: '🔐'
   },
   {
-    id: 'clm',
-    icon: '💎',
-    title: 'Concentrated Liquidity Manager (CLM)',
-    tag: 'DYNAMIC LIQUIDITY',
-    contract: 'contracts/RobynCLMVault.sol',
-    summary: 'Algorithmic liquidity management that dynamically adjusts price tick bounds around Robinhood retail orderbook volume.',
-    capability: 'Continuously rebalances LP ranges to capture maximum trading fee velocity while minimizing impermanent loss.',
-    architecture: 'Automated on-chain rebalancing without manual LP intervention.',
-    code: `# Python SDK: Dynamic CLM Tick Optimizer
-clm = agent.get_clm_module(pool="0xRobinhoodPool...")
-clm.rebalance_ticks(
-    range_width_bps=200,
-    auto_compound=True
-)`,
+    id: 'plugin-uniswap',
+    name: '@robyn-os/plugin-uniswap',
+    version: 'v1.0.0',
+    category: 'DEFI & LIQUIDITY',
+    desc: 'Automated Uniswap V3 concentrated liquidity management, flash arbitrage scanning, and pool routing.',
+    install: 'robyn plugins add @robyn-os/plugin-uniswap',
+    capabilities: ['V3 Tick Re-centering', 'Flash Arb Scanning', 'Optimal Fee Capture'],
+    icon: '📈'
   },
   {
-    id: 'accounts',
-    icon: '🛡️',
-    title: 'ERC-4337 Smart Accounts & Session Keys',
-    tag: 'NON-CUSTODIAL',
-    contract: 'robyn/chain/wallet.py',
-    summary: 'Non-custodial agent delegation using account abstraction session keys on Robinhood Orbit.',
-    capability: 'Users grant restricted session keys with strict spending limits, contract whitelists, and expiry timestamps.',
-    architecture: 'Maintains 100% self-custody while enabling 24/7 autonomous agent execution.',
-    code: `# Python SDK: Create Restricted Session Key
-session = agent.create_session_key(
-    spending_limit_eth=0.5,
-    valid_duration_hours=24,
-    whitelisted_contracts=["0xVault...", "0xRouter..."]
-)`,
+    id: 'plugin-hermes',
+    name: '@robyn-os/plugin-hermes',
+    version: 'v1.0.0',
+    category: 'AI MODEL RUNTIME',
+    desc: 'High-speed inference runtime for robynhooood/Robyn-Agent (0.5B Hermes fine-tuned tool-calling model).',
+    install: 'robyn plugins add @robyn-os/plugin-hermes',
+    capabilities: ['0.5B Tool Calling', 'Sub-50ms Inference', 'Local GGUF / vLLM Ready'],
+    icon: '🧠'
   },
   {
-    id: 'oracle',
-    icon: '📡',
-    title: 'Verifiable State & Inference Oracle',
-    tag: 'CRYPTOGRAPHIC AUDIT',
-    contract: 'contracts/RobynTradeProofOracle.sol',
-    summary: 'Generates on-chain cryptographic receipts and verifiable audit proofs for all autonomous actions.',
-    capability: 'Commits verifiable inference hashes and trade receipts directly to smart contracts without centralized API trust.',
-    architecture: 'Decentralized verification guarantees transparent on-chain AI outputs.',
-    code: `# Python SDK: Verifiable State Verification
-receipt = agent.get_latest_execution_proof()
-print(f"Proof Hash: {receipt.proof_hash}")
-print(f"Block Height: #{receipt.block_number}")`,
+    id: 'plugin-telegram',
+    name: '@robyn-os/plugin-telegram',
+    version: 'v1.0.0',
+    category: 'CLIENT / MESSAGING',
+    desc: 'Natural language chat interface for Telegram channels, instant trade dispatching, and alert webhooks.',
+    install: 'robyn plugins add @robyn-os/plugin-telegram',
+    capabilities: ['Chat NLP Directives', 'Real-time PnL Alerts', 'Secure Webhooks'],
+    icon: '💬'
   },
+  {
+    id: 'plugin-proofs',
+    name: '@robyn-os/plugin-proofs',
+    version: 'v1.0.0',
+    category: 'SECURITY & VERIFIABILITY',
+    desc: 'Generates on-chain cryptographic execution receipts and audit proofs for full transparent verification.',
+    install: 'robyn plugins add @robyn-os/plugin-proofs',
+    capabilities: ['Merkle State Receipts', 'Blockscout Anchors', 'Tamper-Proof Audit Log'],
+    icon: '🛡️'
+  }
 ]
 
 export default function FrameworkModules() {
-  const [activeTab, setActiveTab] = useState(MODULES[0].id)
-  const currentModule = MODULES.find((m) => m.id === activeTab) || MODULES[0]
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const handleCopy = (id: string, text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
+  }
 
   return (
-    <section id="modules" className="space-y-10">
-      {/* Section Header */}
-      <div className="text-center max-w-2xl mx-auto">
-        <span className="bg-[#00C805]/10 border border-[#00C805]/30 text-[#00C805] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
-          Framework Primitives
-        </span>
-        <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-3">
-          5 Core AI Framework Modules
-        </h2>
-        <p className="text-gray-400 text-xs sm:text-sm mt-2">
-          Pioneering autonomous EVM intelligence natively integrated with Robinhood Chain's financial infrastructure.
-        </p>
-      </div>
-
-      {/* Module Selector Pill Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {MODULES.map((mod) => (
-          <button
-            key={mod.id}
-            type="button"
-            onClick={() => setActiveTab(mod.id)}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
-              activeTab === mod.id
-                ? 'bg-[#00C805] text-black shadow-lg shadow-[#00C805]/20 font-extrabold'
-                : 'bg-[#090B0E] border border-white/10 text-gray-300 hover:text-white hover:border-white/20'
-            }`}
-          >
-            <span>{mod.icon}</span>
-            <span>{mod.title.split(' ')[0]}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Active Module Detail Card */}
-      <div className="rounded-3xl bg-[#090B0E] border border-white/10 p-6 sm:p-10 shadow-2xl">
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Details */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="flex items-center gap-3">
-              <span className="w-12 h-12 rounded-2xl bg-[#00C805]/10 border border-[#00C805]/30 flex items-center justify-center text-2xl">
-                {currentModule.icon}
-              </span>
-              <div>
-                <span className="text-[10px] font-bold text-[#00C805] uppercase tracking-wider">
-                  {currentModule.tag}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {currentModule.title}
-                </h3>
-              </div>
-            </div>
-
-            <p className="text-gray-300 text-sm leading-relaxed">{currentModule.summary}</p>
-
-            <div className="space-y-3 pt-1">
-              <div className="p-4 bg-black/60 rounded-xl border border-white/10 space-y-1">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                  Core AI Capability:
-                </span>
-                <p className="text-gray-300 text-xs leading-relaxed">{currentModule.capability}</p>
-              </div>
-
-              <div className="p-4 bg-black/60 rounded-xl border border-[#00C805]/20 space-y-1">
-                <span className="text-[10px] font-bold text-[#00C805] uppercase tracking-wider block">
-                  Network Architecture:
-                </span>
-                <p className="text-gray-300 text-xs leading-relaxed">{currentModule.architecture}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-gray-400 pt-2 font-mono">
-              <span>Module Source:</span>
-              <span className="text-[#00C805] bg-white/5 px-2.5 py-1 rounded border border-white/10">
-                {currentModule.contract}
-              </span>
-            </div>
+    <section id="plugins" className="space-y-6 pt-6">
+      {/* Header Info */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#00C805]">
+            <span>// 03_PLUGIN_REGISTRY</span>
           </div>
-
-          {/* Right Column: Code Implementation Snippet */}
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl bg-black border border-white/15 p-5 font-mono text-xs shadow-xl space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
-                  <span className="text-gray-400 text-[11px] ml-2 font-semibold">SDK Execution Snippet</span>
-                </div>
-                <span className="text-[10px] text-[#00C805] font-bold">PYTHON 3.10+</span>
-              </div>
-
-              <pre className="text-gray-300 text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap">
-                <code>{currentModule.code}</code>
-              </pre>
-
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-500">
-                <span>Autonomous EVM Execution</span>
-                <span className="text-[#00C805] font-semibold">100ms Block Ready</span>
-              </div>
-            </div>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+            Modular Plugin Ecosystem
+          </h2>
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">
+            Extensible architecture inspired by ElizaOS. Plug in Robinhood RPCs, Uniswap V3, Telegram, or Hermes models with one line.
+          </p>
         </div>
+
+        <div className="font-mono text-xs text-[#00C805] border border-[#00C805]/30 bg-black/80 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+          6 OFFICIAL PLUGINS ACTIVE
+        </div>
+      </div>
+
+      {/* Grid of 6 Plugins */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {PLUGINS.map((plugin) => (
+          <div
+            key={plugin.id}
+            className="group relative bg-[#04070A] hover:bg-[#070B10] border border-white/10 hover:border-[#00C805]/50 rounded-2xl p-6 transition-all duration-300 shadow-xl flex flex-col justify-between"
+          >
+            <div>
+              {/* Header with Icon & Category */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-2xl p-2.5 bg-black rounded-xl border border-white/10 group-hover:border-[#00C805]/40 transition">
+                  {plugin.icon}
+                </span>
+                <div className="text-right font-mono">
+                  <span className="text-[10px] font-bold tracking-wider text-[#00C805] block">
+                    {plugin.category}
+                  </span>
+                  <span className="text-[10px] text-gray-500">{plugin.version}</span>
+                </div>
+              </div>
+
+              {/* Plugin Name */}
+              <h3 className="font-mono text-sm sm:text-base font-extrabold text-white group-hover:text-[#00C805] transition">
+                {plugin.name}
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+                {plugin.desc}
+              </p>
+
+              {/* Capability Badges */}
+              <div className="flex flex-wrap gap-1.5 mt-4">
+                {plugin.capabilities.map((cap, i) => (
+                  <span
+                    key={i}
+                    className="font-mono text-[10px] bg-black/60 border border-white/10 rounded-md px-2 py-0.5 text-gray-300"
+                  >
+                    {cap}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Install Box */}
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <div className="bg-black/90 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between font-mono text-[11px]">
+                <span className="text-gray-400 truncate mr-2">{plugin.install}</span>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(plugin.id, plugin.install)}
+                  className="text-xs font-sans text-gray-400 hover:text-white font-bold px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition shrink-0"
+                >
+                  {copiedId === plugin.id ? '✓' : 'Copy'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )

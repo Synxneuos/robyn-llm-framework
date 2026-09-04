@@ -5,116 +5,122 @@ import React from 'react'
 export default function FrameworkArchitecture() {
   const PIPELINE_STEPS = [
     {
-      step: '01',
-      title: 'Intent & Client Ingestion',
-      desc: 'Accepts natural language directives via Web3 dApps, Telegram bots, or Python SDK.',
-      tag: 'NLP INGESTION',
-      code: 'user: "Rebalance LP ticks & execute arbitrage"',
+      step: '01 // PERCEPTION',
+      title: 'Orbit Ingestion & Signal Loop',
+      desc: 'High-frequency WebSocket stream listening directly to Robinhood Nitro mempool at 100ms intervals.',
+      tag: 'NITRO STREAM',
+      code: 'stream.on("block", (b) => ingest(b.transactions))',
     },
     {
-      step: '02',
-      title: 'Robyn Neural LLM Brain',
-      desc: 'Parses intent into structured Hermes <tool_call> JSON format with strict safety validation.',
-      tag: 'HERMES PARSER',
-      code: '<tool_call> {"name": "execute_clm_rebalance", "args": {...}}',
+      step: '02 // REASONING',
+      title: 'Robyn Neural 0.5B Tool Calling',
+      desc: 'Fine-tuned Hermes LLM decomposes multi-step directives into deterministic EVM tool calls.',
+      tag: 'TOOL CALLING',
+      code: '<tool_call> {"name": "arb_swap", "params": {...}}',
     },
     {
-      step: '03',
-      title: 'Sub-100ms Orbit Dispatcher',
-      desc: 'Synthesizes EVM bytecode and dispatches to Robinhood Nitro Sequencer via WebSocket feed.',
-      tag: 'NITRO SEQUENCER',
-      code: 'eth_sendRawTransaction(calldata_0x6a7b...)',
+      step: '03 // SIMULATION',
+      title: 'Zero-Revert Pre-Flight Engine',
+      desc: 'Simulates state transitions off-chain to guarantee gas efficiency and 100% execution success.',
+      tag: 'EVM SIMULATOR',
+      code: 'eth_call(tx) => status: SUCCESS, gasUsed: 42000',
     },
     {
-      step: '04',
-      title: 'On-Chain Settlement',
-      desc: 'Atomic execution on Robinhood Chain with sub-second block inclusion and cryptographic receipts.',
-      tag: 'ORBIT SETTLEMENT',
-      code: 'Block #54,345,100 · Latency: 18ms · 0.36 Gwei',
+      step: '04 // SETTLEMENT',
+      title: 'Arbitrum Nitro Atomic Execution',
+      desc: 'Broadcasts signed bundle to Robinhood Chain with sub-100ms inclusion and cryptographic receipt.',
+      tag: 'ON-CHAIN SETTLE',
+      code: 'tx_hash: 0x4f8a...c7b2 [Block #54,440,747]',
     },
   ]
 
   const TECH_SPECS = [
     {
-      title: '100ms Sub-Second Blocks',
+      title: '100ms Block Latency',
       val: '100ms',
-      desc: 'Faster block execution than Solana with Ethereum Layer-2 rollup security and finality.',
+      desc: 'Ultra-low latency Arbitrum Orbit Nitro L2 rollup finality.',
       icon: '⚡',
     },
     {
-      title: 'Robyn Neural Model',
+      title: 'Robyn-Neural LLM',
       val: '0.5B Params',
-      desc: 'Lightweight, ultra-fast tool-calling model optimized for on-chain EVM execution.',
+      desc: 'Ultra-lightweight on-device tool calling model on Hugging Face.',
       icon: '🧠',
     },
     {
-      title: 'Near-Zero Gas Fees',
+      title: 'Sub-Cent Gas Fees',
       val: '~0.36 Gwei',
-      desc: 'Micro-cent execution costs enable continuous autonomous AI agent swarms without treasury drain.',
+      desc: 'Continuous autonomous agent swarms without treasury depletion.',
       icon: '⛽',
     },
     {
-      title: 'EVM Interoperability',
+      title: 'Universal EVM',
       val: 'Orbit Nitro',
-      desc: 'Natively compatible with all DEX AMMs, smart contracts, and tokens on Robinhood Chain.',
+      desc: 'Zero friction compatibility with all ERC-20, AMM, and RWA contracts.',
       icon: '🌐',
     },
   ]
 
   return (
-    <section id="architecture" className="space-y-10">
+    <section id="architecture" className="space-y-10 pt-6">
       {/* Section Header */}
-      <div className="text-center max-w-2xl mx-auto">
-        <span className="bg-[#00C805]/10 border border-[#00C805]/30 text-[#00C805] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
-          Architecture & Engine
-        </span>
-        <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-3">
-          How the Robyn OS Framework Works
-        </h2>
-        <p className="text-gray-400 text-xs sm:text-sm mt-2">
-          From natural language input to atomic sub-second blockchain settlement across Robinhood Chain.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#00C805]">
+            <span>// 04_RUNTIME_PIPELINE</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+            4-Stage Autonomous Pipeline
+          </h2>
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">
+            How Robyn OS transitions from natural language intent to sub-100ms atomic on-chain settlement.
+          </p>
+        </div>
+
+        <div className="font-mono text-xs text-gray-400 bg-black/60 border border-white/10 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+          LATENCY TARGET: <span className="text-[#00C805] font-bold">&lt;100ms</span>
+        </div>
       </div>
 
-      {/* 4-Step Pipeline */}
+      {/* 4-Step Pipeline Cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {PIPELINE_STEPS.map((item) => (
+        {PIPELINE_STEPS.map((item, index) => (
           <div
-            key={item.step}
-            className="rounded-2xl bg-[#090B0E] border border-white/10 p-6 flex flex-col justify-between hover:border-[#00C805]/40 transition shadow-lg relative group"
+            key={index}
+            className="rounded-2xl bg-[#030608] border border-white/10 hover:border-[#00C805]/40 p-5 flex flex-col justify-between transition-all duration-300 shadow-xl relative group"
           >
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-2xl font-black text-[#00C805] font-mono">{item.step}</span>
-                <span className="text-[10px] font-bold text-gray-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded uppercase">
+              <div className="flex items-center justify-between mb-3 font-mono">
+                <span className="text-xs font-bold text-[#00C805]">{item.step}</span>
+                <span className="text-[9px] font-bold text-gray-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
                   {item.tag}
                 </span>
               </div>
-              <h3 className="font-extrabold text-white text-base mb-2 group-hover:text-[#00C805] transition">
+              <h3 className="font-mono font-bold text-white text-sm sm:text-base mb-2 group-hover:text-[#00C805] transition">
                 {item.title}
               </h3>
               <p className="text-gray-400 text-xs leading-relaxed mb-4">{item.desc}</p>
             </div>
-            <div className="bg-black/80 border border-white/10 rounded-lg p-2 font-mono text-[10px] text-gray-300 overflow-x-auto">
+            <div className="bg-black/90 border border-white/10 rounded-lg p-2.5 font-mono text-[11px] text-[#4EFA66] overflow-x-auto">
               <code>{item.code}</code>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 4 Technical Highlights */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {TECH_SPECS.map((spec) => (
+      {/* 4 Tech Specs Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+        {TECH_SPECS.map((spec, index) => (
           <div
-            key={spec.title}
-            className="rounded-2xl bg-[#090B0E] border border-white/10 p-6 shadow-md"
+            key={index}
+            className="bg-[#020406] border border-white/10 rounded-2xl p-5 hover:border-[#00C805]/30 transition"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{spec.title}</span>
-              <span className="text-lg">{spec.icon}</span>
+              <span className="text-xl">{spec.icon}</span>
+              <span className="font-mono text-sm font-extrabold text-[#00C805]">{spec.val}</span>
             </div>
-            <div className="text-2xl font-black text-white font-mono">{spec.val}</div>
-            <p className="text-xs text-gray-400 mt-2 leading-relaxed">{spec.desc}</p>
+            <div className="font-mono text-xs font-bold text-white mt-1">{spec.title}</div>
+            <div className="text-[11px] text-gray-400 mt-1 leading-relaxed">{spec.desc}</div>
           </div>
         ))}
       </div>

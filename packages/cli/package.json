@@ -1,0 +1,20 @@
+{
+  "name": "@robyn-os/cli",
+  "version": "1.0.0",
+  "description": "The Autonomous Multi-Agent AI CLI for Robinhood Chain",
+  "main": "bin/robyn.js",
+  "bin": {
+    "robyn": "./bin/robyn.js",
+    "robyn-os": "./bin/robyn.js"
+  },
+  "type": "module",
+  "keywords": [
+    "ai-agents",
+    "robinhood-chain",
+    "arbitrum-orbit",
+    "elizaos",
+    "cli"
+  ],
+  "author": "Synxneuos",
+  "license": "Apache-2.0"
+}

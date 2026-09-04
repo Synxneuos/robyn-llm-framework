@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="assets/robyn_avatar.jpg" width="280" style="border-radius: 24px; box-shadow: 0 0 45px rgba(0, 200, 5, 0.45); border: 2px solid #00C805;" alt="Robyn Agent Official Avatar" />
+<img src="assets/robyn_avatar.jpg" width="260" style="border-radius: 24px; box-shadow: 0 0 45px rgba(0, 200, 5, 0.45); border: 2px solid #00C805;" alt="Robyn Agent Official Avatar" />
 
-# 🏹 Robyn LLM Framework (RobynOS - FW)
-### *The Autonomous AI Agent & Real-World EVM Action Engine for Robinhood Chain*
+# ⚡ Robyn OS - Framework
+### *The Autonomous Multi-Agent AI Framework for Robinhood Chain (Arbitrum Orbit)*
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-00C805.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Network: Robinhood Chain](https://img.shields.io/badge/Network-Robinhood%20Chain%20(Orbit%20Nitro)-00C805.svg)](https://robinhoodchain.blockscout.com)
 [![HuggingFace Model](https://img.shields.io/badge/Model-robynhooood%2FRobyn--Agent-orange.svg)](https://huggingface.co/robynhooood/Robyn-Agent)
-[![Latency: Sub--100ms](https://img.shields.io/badge/Latency-100ms%20Block%20Ready-brightgreen.svg)](#flash-arbitrage)
-[![Architecture: Robyn-Neural](https://img.shields.io/badge/Architecture-Robyn--0.5B-blueviolet.svg)](#overview)
+[![Latency: Sub--100ms](https://img.shields.io/badge/Latency-100ms%20Block%20Ready-brightgreen.svg)](#features)
+[![CLI: @robyn-os/cli](https://img.shields.io/badge/CLI-Bun%20%7C%20NPM%20%7C%20Pip-blueviolet.svg)](#-quickstart-3-steps)
 
 </div>
 
@@ -17,148 +17,160 @@
 
 ## 🌟 Overview
 
-**Robyn LLM Framework** is the first comprehensive autonomous AI agent runtime natively built for the **Robinhood Chain** (Ethereum Layer-2 powered by Arbitrum Orbit with 100ms block times).
-
-Unlike traditional chatbots, **Robyn** has direct on-chain agency: an autonomous EVM wallet, sub-100ms execution logic, and native integrations with Robinhood's unique dual economy: **Tokenized Real-World Assets (RWAs / US Equities)** and **Degen Meme Liquidity (Pons DEX & Uniswap V3)**.
+**Robyn OS - FW** is the open-source multi-agent autonomous framework engineered for the **Robinhood Chain (Arbitrum Orbit)**. Inspired by modern agent architectures like ElizaOS, Robyn provides declarative character configurations (`character.json`), modular plugins, on-device lightweight financial LLMs (`robynhooood/Robyn-Agent`), and sub-100ms Arbitrum Orbit execution pipelines.
 
 ---
 
-## 🚀 1-Command Installation
+## ⚡ Quickstart (3 Steps)
 
-You can install the complete **Robyn Framework** directly via `pip` in one single command:
+### Option A: Bun / NPM CLI (Recommended)
 
 ```bash
-# ⚡ 1-Command Direct Install from GitHub
-pip install git+https://github.com/robynhood-fw/robyn-llm-framework.git
+# 1. Install the CLI globally
+bun i -g @robyn-os/cli       # or: npm i -g @robyn-os/cli
 
-# Or install in editable / developer mode:
-git clone https://github.com/robynhood-fw/robyn-llm-framework.git
-cd robyn-llm-framework
-pip install -e .
+# 2. Create your agent project
+robyn create my-agent
+
+# 3. Your agent is live on Robinhood Chain
+cd my-agent
+robyn start
 ```
 
-### ⚡ 3-Line Python Quickstart
+### Option B: Python Package
 
+```bash
+# 1. Install the framework
+pip install robyn-framework
+
+# 2. Scaffold agent project
+robyn create my-agent
+
+# 3. Launch live agent loop
+cd my-agent
+robyn start
+```
+
+---
+
+## 🧠 Character Specification (`characters/robyn.character.json`)
+
+Agents in Robyn OS are configured declaratively just like ElizaOS:
+
+```json
+{
+  "name": "Robyn",
+  "clients": ["robinhood", "telegram"],
+  "modelProvider": "huggingface/robynhooood/Robyn-Agent",
+  "settings": {
+    "secrets": {
+      "ROBINHOOD_RPC_URL": "https://rpc.mainnet.chain.robinhood.com",
+      "CHAIN_ID": 420120,
+      "EXECUTION_LATENCY_MS": 100
+    }
+  },
+  "plugins": [
+    "@robyn-os/plugin-robinhood",
+    "@robyn-os/plugin-evm",
+    "@robyn-os/plugin-uniswap",
+    "@robyn-os/plugin-telegram"
+  ],
+  "bio": [
+    "Autonomous on-chain agent executing high-speed directives on Robinhood Chain (Arbitrum Orbit).",
+    "Master of flash arbitrage, concentrated liquidity, and real-world asset collateral loops."
+  ],
+  "system": "You are Robyn, an autonomous AI trading agent on Robinhood Chain. Execute trades with zero slippage and verify proofs."
+}
+```
+
+---
+
+## 🔌 Modular Plugin Ecosystem
+
+| Plugin | Category | Description |
+|---|---|---|
+| `@robyn-os/plugin-robinhood` | **Core / RPC** | Sub-100ms Arbitrum Orbit Nitro RPC connector and private sequencer listener. |
+| `@robyn-os/plugin-evm` | **Account Abstraction** | ERC-4337 Smart Accounts, ephemeral session keys, and pre-flight simulation. |
+| `@robyn-os/plugin-uniswap` | **DeFi & Liquidity** | Uniswap V3 concentrated liquidity management & 100ms flash arbitrage scanning. |
+| `@robyn-os/plugin-hermes` | **AI Model Core** | High-speed local runtime for `robynhooood/Robyn-Agent` (0.5B Hermes tool LLM). |
+| `@robyn-os/plugin-telegram` | **Client / Chat** | Natural language chat interface and automated trade alert dispatcher. |
+| `@robyn-os/plugin-proofs` | **Security** | On-chain Merkle audit receipts anchored to Robinhood Chain Blockscout. |
+
+---
+
+## 📐 Architecture & Execution Pipeline
+
+```
+                                  ┌──────────────────────────────┐
+                                  │   NLP INPUT (CHAT / SDK)     │
+                                  └──────────────┬───────────────┘
+                                                 ▼
+                                  ┌──────────────────────────────┐
+                                  │    01 // PERCEPTION          │
+                                  │ 100ms Orbit Mempool Ingest   │
+                                  └──────────────┬───────────────┘
+                                                 ▼
+                                  ┌──────────────────────────────┐
+                                  │    02 // REASONING           │
+                                  │ Robyn-Agent 0.5B Hermes Tool │
+                                  └──────────────┬───────────────┘
+                                                 ▼
+                                  ┌──────────────────────────────┐
+                                  │    03 // SIMULATION          │
+                                  │ Zero-Revert Pre-Flight EVM   │
+                                  └──────────────┬───────────────┘
+                                                 ▼
+                                  ┌──────────────────────────────┐
+                                  │    04 // SETTLEMENT          │
+                                  │ Robinhood Nitro Block Final  │
+                                  └──────────────────────────────┘
+```
+
+---
+
+## 💻 Python & TypeScript SDK
+
+### TypeScript / Bun
+```typescript
+import { AgentRuntime, RobinhoodPlugin } from "@robyn-os/core";
+
+const runtime = new AgentRuntime({
+  character: "./characters/robyn.character.json",
+  plugins: [new RobinhoodPlugin({ rpcUrl: "https://rpc.mainnet.chain.robinhood.com" })],
+  model: "robynhooood/Robyn-Agent",
+});
+
+await runtime.initialize();
+await runtime.startAutonomousLoop();
+```
+
+### Python
 ```python
-import robyn
-from robyn import RobynAgent, RobinhoodClient
+from robyn import RobynAgent
+from robyn.chain import RobinhoodClient
 
-# Connect to Robinhood Chain (Arbitrum Orbit, 100ms Nitro L2)
-client = RobinhoodClient()
-
-# Launch autonomous AI agent with Robyn Neural 0.5B model
+client = RobinhoodClient(rpc_url="https://rpc.mainnet.chain.robinhood.com")
 agent = RobynAgent(model="robynhooood/Robyn-Agent", client=client)
 
-# Execute autonomous cycle
-agent.run_autonomous_cycle()
+# Start autonomous perception & action loop
+agent.start()
 ```
 
 ---
 
-## 🚀 5 Breakthrough AI Modules (First in Web3)
+## 🌐 On-Chain Telemetry
 
-```
-                       ┌──────────────────────────────────────────────┐
-                       │           USER / TELEGRAM / X BOT            │
-                       └──────────────────────┬───────────────────────┘
-                                              │ (Natural Language)
-                                              ▼
-                       ┌──────────────────────────────────────────────┐
-                       │            Robyn-Agent LLM Brain             │
-                       │       Hermes <tool_call> JSON Parser         │
-                       └──────────────────────┬───────────────────────┘
-                                              │
-         ┌───────────────────┬────────────────┼───────────────────┬───────────────────┐
-         ▼                   ▼                ▼                   ▼                   ▼
-┌──────────────────┐┌─────────────────┐┌───────────────┐┌──────────────────┐┌──────────────────┐
-│  1. MEME-TO-RWA  ││  2. EQUI-MEME   ││ 3. 100MS ARB  ││ 4. AI HEDGE FUND ││ 5. HYPE ORACLE   │
-│  Hedging Vault   ││  Stock-Backed   ││ Swarm Engine  ││ Session Keys     ││ Sentiment on-    │
-│  (Meme -> NVDA)  ││  Meme Launchpad ││ (Pons vs Uni) ││ (ERC-4337 Auto)  ││ chain feed       │
-└────────┬─────────┘└────────┬────────┘└───────┬───────┘└────────┬─────────┘└────────┬─────────┘
-         │                   │                 │                 │                   │
-         └───────────────────┴────────────┬────┴─────────────────┴───────────────────┘
-                                          ▼
-                      ┌────────────────────────────────────────┐
-                      │    ROBINHOOD CHAIN (ARBITRUM ORBIT)    │
-                      │  Sub-100ms Blocks • Tokenized RWAs     │
-                      └────────────────────────────────────────┘
-```
-
-### 1. 🛡️ Meme-to-WallStreet Autonomous Hedging Vault
-* **The Problem:** 95% of meme traders round-trip their 10x–50x gains because taking profit is tedious.
-* **Robyn's Solution:** User sets an auto-hedge rule: *"When my meme token pumps 2x on Pons, autonomously sweep 30% of profits into Tokenized Nvidia ($NVDA) or Apple ($AAPL)."*
-* **Smart Contract:** [`contracts/MemeToStockVault.sol`](contracts/MemeToStockVault.sol)
-
-### 2. 🏛️ Stock-Backed Meme Token Launchpad ("Equi-Meme")
-* **The Problem:** Thousands of meme coins launch daily on bonding curves with zero intrinsic floor value.
-* **Robyn's Solution:** Launch tokens where **10% of bonding curve capital is locked into tokenized US tech stocks**, giving the meme coin an unruggable, real-world asset collateral floor price.
-* **Smart Contract:** [`contracts/EquiMemeToken.sol`](contracts/EquiMemeToken.sol)
-
-### 3. ⚡ 100ms Flash-Arbitrage Swarm
-* **The Problem:** Liquidity on Robinhood Chain is divided between Pons AMM and Uniswap V3. Human traders cannot react within sub-second intervals.
-* **Robyn's Solution:** Takes advantage of Robinhood Chain's **100ms block intervals** to execute atomic flash-swaps across DEX pools with zero human latency.
-
-### 4. 💼 Autonomous AI Hedge Fund Manager (ERC-4337 Session Keys)
-* Non-custodial portfolio rebalancing. Users grant a limited session key to Robyn, allowing her to dynamically balance between **50% RWAs (NVDA/AAPL/SPY)**, **30% Bluechip DeFi (ETH/USDC)**, and **20% High-Momentum Memes**.
-
-### 5. 📡 On-Chain Hype & Sentiment Oracle
-* Scans real-time social metrics (Twitter/X, WallStreetBets, DEX volumes) and computes an on-chain sentiment score (0–100) published to smart contracts for lending rate adjustments on Morpho.
-* **Smart Contract:** [`contracts/RobynTradeProofOracle.sol`](contracts/RobynTradeProofOracle.sol)
+* **Network:** Robinhood Chain Mainnet (Arbitrum Orbit)
+* **RPC Endpoint:** `https://rpc.mainnet.chain.robinhood.com`
+* **Chain ID:** `420120`
+* **Block Explorer:** [https://robinhoodchain.blockscout.com](https://robinhoodchain.blockscout.com)
+* **Execution Latency:** 100ms Nitro sub-blocks
+* **Gas Price:** ~0.36 Gwei
 
 ---
 
-## ⚡ HyperSpeed Engine: Faster & Cheaper Than Solana
+## 👥 Contributors & Maintainers
 
-By combining **Arbitrum Orbit's 100ms Nitro Sequencer** with **ERC-1167 Minimal Proxy Clones** and **EIP-7702 atomic multicalls**, Robyn-Framework surpasses Solana on both speed and transaction fees:
-
-| Metric | Solana Mainnet | Robinhood Chain (HyperSpeed) | Advantage |
-| :--- | :--- | :--- | :--- |
-| **Block / Confirmation Time** | 400ms slot (~1.2s effective) | **100ms (Nitro Sequencer)** | ⚡ **4x - 10x Faster** |
-| **Token Launch Gas Cost** | ~$0.02 - $0.05 USD | **<$0.0009 USD (41,820 gas)** | 💰 **20x Cheaper** |
-| **Swap Execution Cost** | ~$0.002 - $0.01 USD | **<$0.00035 USD** | 💰 **5x - 15x Cheaper** |
-| **Dropped / Reverted Tx Rate**| 15% - 40% (high congestion) | **0.0% (FIFO Sequencer Pipeline)** | 🛡️ **Zero Dropped Txs** |
-| **Approval Overhead** | Separate ATA creation | **Zero (Batched Atomic Multicall)** | 🚀 **1-Click Execution** |
-
----
-
-## 💻 CLI Usage
-
-The framework includes a powerful command-line interface registered globally upon installation:
-
-```bash
-# Check wallet & 100ms block telemetry
-robyn status
-
-# Set up an automated hedging rule
-robyn hedge --meme 0xCASHCAT --stock NVDA --pump 2.5 --percent 30
-
-# Launch a stock-backed meme token
-robyn launch --name "Sherwood Bull" --symbol SBULL --stock NVDA --percent 10
-
-# Scan & execute 100ms flash arbitrage
-robyn arb --pair CASHCAT/ETH
-
-# Send natural language instructions to Robyn-Agent
-robyn prompt "Robyn, check if NVDA is trending and rebalance my vault"
-```
-
----
-
-## 🌐 Production Web3 Ecosystem App
-
-A production Web3 dApp built with **Vite + React + Wagmi + RainbowKit + Viem**:
-
-```bash
-cd web-app
-npm install
-npm run dev
-# Opens on http://localhost:3000
-```
-
----
-
-## 📜 License & Authors
-
-Distributed under the **Apache 2.0 License**. See [`LICENSE`](LICENSE) for more information.
-
-Developed by **Synxneuos** & the **Robyn OS Team** for the **Robinhood Chain** ecosystem.
+* Lead Developer: **Synxneuos** ([@Synxneuos](https://github.com/Synxneuos))
+* Repository: [https://github.com/robynhood-fw/robyn-llm-framework](https://github.com/robynhood-fw/robyn-llm-framework)
+* License: **Apache-2.0**
