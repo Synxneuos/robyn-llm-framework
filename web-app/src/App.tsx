@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 import HeroBanner from '../components/HeroBanner'
-import AIAgentTerminal from '../components/AIAgentTerminal'
 import TokenomicsSimulator from '../components/TokenomicsSimulator'
 import VaultDashboard from '../components/VaultDashboard'
 import DocsPage from '../components/DocsPage'
@@ -10,37 +9,6 @@ import DocsPage from '../components/DocsPage'
 export default function App() {
   const { isConnected } = useAccount()
   const [currentView, setCurrentView] = useState<'app' | 'docs'>('app')
-  const [blockNumber, setBlockNumber] = useState<number | null>(null)
-  const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
-
-  // Fetch real on-chain block number & gas price from Robinhood RPC
-  useEffect(() => {
-    const fetchRpcStats = async () => {
-      try {
-        const res = await fetch('https://rpc.mainnet.chain.robinhood.com', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify([
-            { jsonrpc: '2.0', id: 1, method: 'eth_blockNumber', params: [] },
-            { jsonrpc: '2.0', id: 2, method: 'eth_gasPrice', params: [] },
-          ]),
-        })
-        const data = await res.json()
-        if (Array.isArray(data)) {
-          const block = parseInt(data[0].result, 16)
-          const gas = (parseInt(data[1].result, 16) / 1e9).toFixed(4)
-          setBlockNumber(block)
-          setGasPriceGwei(gas)
-        }
-      } catch (err) {
-        console.warn('RPC poll error:', err)
-      }
-    }
-
-    fetchRpcStats()
-    const interval = setInterval(fetchRpcStats, 5000)
-    return () => clearInterval(interval)
-  }, [])
 
   const scrollToSection = (id: string) => {
     setCurrentView('app')
@@ -52,47 +20,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#040608] text-white selection:bg-green-500 selection:text-black">
-      {/* 1. Live Robinhood Nitro L2 Telemetry Status Bar */}
-      <div className="bg-[#020d04] border-b border-green-500/20 text-xs py-2 px-4 text-green-300">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="font-extrabold tracking-wider text-white">ROBYN OS - FW</span>
-            <span className="text-green-500/40">|</span>
-            <span className="font-semibold text-green-400">ROBINHOOD CHAIN (ID: 4663)</span>
-            <span className="text-green-500/40">|</span>
-            <span className="font-mono">Block: {blockNumber ? `#${blockNumber.toLocaleString()}` : 'Connecting RPC...'}</span>
-            <span className="text-green-500/40">|</span>
-            <span className="font-mono">Gas: {gasPriceGwei} Gwei</span>
-            <span className="text-green-500/40 hidden md:inline">|</span>
-            <span className="text-gray-300 hidden md:inline">Latency: <strong className="text-green-400">100ms Orbit Nitro</strong></span>
-            <span className="text-green-500/40 hidden lg:inline">|</span>
-            <span className="text-gray-400 hidden lg:inline">Supply: <strong className="text-white font-mono">1,000,000,000 $ROBYN</strong></span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px]">
-            <button
-              onClick={() => setCurrentView('docs')}
-              className="text-green-400 hover:text-green-300 font-bold flex items-center gap-1 underline"
-            >
-              📄 Whitepaper & Docs ↗
-            </button>
-            <a
-              href="https://robinhoodchain.blockscout.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-green-300 flex items-center gap-1 font-semibold"
-            >
-              Blockscout ↗
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Sleek Robinhood-Style Top Navigation Bar */}
+      {/* Sleek Robinhood Navigation Bar */}
       <header className="border-b border-white/10 backdrop-blur-xl sticky top-0 z-50 bg-[#040608]/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div
@@ -100,22 +28,22 @@ export default function App() {
             className="flex items-center gap-3 cursor-pointer select-none"
           >
             {/* Robinhood Feather Emblem */}
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center p-2 shadow-lg shadow-green-500/30">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center p-2 shadow-lg shadow-green-500/20">
               <svg className="w-full h-full text-black fill-current" viewBox="0 0 24 24">
                 <path d="M12 2L4 10h5v10h6V10h5L12 2z" />
               </svg>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-black text-white text-xl tracking-tight leading-none">
+                <h1 className="font-black text-white text-lg sm:text-xl tracking-tight leading-none">
                   Robyn OS <span className="text-green-400 font-extrabold">- FW</span>
                 </h1>
-                <span className="bg-green-500/20 text-green-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-green-500/40 tracking-wider">
-                  FIRST ON-CHAIN AI
+                <span className="hidden sm:inline-block bg-green-500/15 text-green-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-green-500/30 tracking-wider">
+                  ROBINHOOD CHAIN
                 </span>
               </div>
-              <p className="text-[11px] text-gray-400 font-medium">
-                Wall Street Collateral · Algorithmic AI Agency
+              <p className="text-[10px] text-gray-400 font-medium hidden sm:block">
+                TradFi Collateral Escrow · 100ms Arbitrum Orbit Nitro
               </p>
             </div>
           </div>
@@ -124,10 +52,10 @@ export default function App() {
             <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-gray-300">
               <button
                 type="button"
-                onClick={() => scrollToSection('agent-terminal')}
+                onClick={() => scrollToSection('vault-actions')}
                 className="hover:text-green-400 transition"
               >
-                AI Terminal
+                Collateral Vault
               </button>
               <button
                 type="button"
@@ -138,13 +66,6 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('vault-actions')}
-                className="hover:text-green-400 transition"
-              >
-                Staking Vault
-              </button>
-              <button
-                type="button"
                 onClick={() => scrollToSection('architecture')}
                 className="hover:text-green-400 transition"
               >
@@ -152,15 +73,14 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setCurrentView('docs')}
-                className={`transition flex items-center gap-1 px-3 py-1 rounded-lg border ${
+                onClick={() => setCurrentView(currentView === 'docs' ? 'app' : 'docs')}
+                className={`transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${
                   currentView === 'docs'
                     ? 'border-green-400 bg-green-500/15 text-green-400 font-bold'
                     : 'border-white/10 hover:border-green-500/40 text-gray-300'
                 }`}
               >
-                <span>Documentation</span>
-                <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.2 rounded font-bold">V1.0</span>
+                <span>{currentView === 'docs' ? '← Back to App' : 'Documentation'}</span>
               </button>
             </nav>
 
@@ -173,19 +93,14 @@ export default function App() {
         </div>
       </header>
 
-      {/* 3. Main Dashboard Body */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-14">
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-12">
         {currentView === 'docs' ? (
           <DocsPage onBackToApp={() => setCurrentView('app')} />
         ) : (
           <>
-            {/* Hero Section */}
+            {/* Clean Hero Banner */}
             <HeroBanner />
-
-            {/* Autonomous AI Agent OS Terminal */}
-            <section id="agent-terminal">
-              <AIAgentTerminal />
-            </section>
 
             {/* Transparent 1B Tokenomics & Collateral Math Simulator */}
             <section id="tokenomics-sim">
@@ -212,11 +127,11 @@ export default function App() {
               <VaultDashboard />
             </section>
 
-            {/* Architecture & 5 Breakthrough Modules Showcase */}
+            {/* Architecture & Breakthrough Modules Showcase */}
             <section id="architecture" className="border-t border-white/10 pt-12">
               <div className="text-center max-w-2xl mx-auto mb-10">
                 <span className="bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  Autonomous Agency
+                  Robyn Ecosystem Engine
                 </span>
                 <h3 className="text-3xl font-black text-white tracking-tight mt-3">
                   The Robyn OS - FW Architectural Engine
@@ -262,7 +177,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. Sleek Minimalist Footer */}
+      {/* Sleek Minimalist Footer */}
       <footer className="border-t border-white/10 bg-[#020503] py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-3">

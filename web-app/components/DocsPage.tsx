@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 
@@ -8,7 +8,7 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
   const SECTIONS = [
     { id: 'intro', title: '1. Vision & Architecture', icon: '🌟' },
     { id: 'collateral', title: '2. TradFi Collateral System', icon: '🏛️' },
-    { id: 'token', title: '3. $ROBYN Token Utility', icon: '💎' },
+    { id: 'token', title: '3. 1B Token Supply & Utility', icon: '💎' },
     { id: 'roadmap', title: '4. Multi-Phase Roadmap', icon: '🗺️' },
     { id: 'sdk', title: '5. Developer Guide & GitHub', icon: '💻' },
   ] as const
@@ -39,7 +39,7 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
         <button
           type="button"
           onClick={onBackToApp}
-          className="bg-green-500/15 hover:bg-green-500/25 border border-green-500/40 text-green-400 text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 self-start sm:self-auto"
+          className="bg-green-500 hover:bg-green-400 text-black text-xs font-extrabold px-5 py-2.5 rounded-xl transition flex items-center gap-2 self-start sm:self-auto shadow-lg shadow-green-500/20"
         >
           <span>← Return to Vault Dashboard</span>
         </button>
@@ -85,8 +85,8 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
               <span className="text-white font-mono">~0.36 Gwei ($0.0001)</span>
             </div>
             <div className="flex justify-between text-gray-400">
-              <span>AI Architecture:</span>
-              <span className="text-white font-mono">Robyn Neural 0.5B</span>
+              <span>Total Fixed Supply:</span>
+              <span className="text-white font-mono">1,000,000,000 $ROBYN</span>
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
               </p>
 
               <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-300 font-medium">
-                🎯 <strong>Robyn OS - FW</strong> is the world's first native, autonomous EVM AI operating system designed specifically for Robinhood Chain. It is not an off-chain chatbot or wrapper; it is an on-chain execution engine with autonomous wallet agency, sub-100ms execution logic, and real-time cryptographic audit proofs.
+                🎯 <strong>Robyn OS - FW</strong> is the world's first native, autonomous EVM AI operating system designed specifically for Robinhood Chain. It is an on-chain execution engine with autonomous wallet agency, sub-100ms execution logic, and real-time cryptographic audit proofs.
               </div>
 
               <h4 className="text-lg font-bold text-white pt-2">Why Robinhood Chain?</h4>
@@ -142,7 +142,7 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
               </div>
 
               <p>
-                The cornerstone of Robyn OS - FW is <code className="bg-black/60 px-2 py-0.5 rounded text-green-400 font-mono">RobinhoodCollateralVault.sol</code>. It solves the biggest problem in Web3: <em>retail crypto traders round-tripping 10x–50x gains because meme tokens have zero fundamental backing.</em>
+                The cornerstone of Robyn OS - FW is <code className="bg-black/60 px-2 py-0.5 rounded text-green-400 font-mono">RobinhoodCollateralVault.sol</code>. It solves the biggest problem in Web3: <em>retail crypto traders round-tripping gains because meme tokens lack fundamental backing.</em>
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4 pt-2">
@@ -160,7 +160,7 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
                 <div className="p-4 bg-white/[0.02] rounded-xl border border-white/10">
                   <h5 className="font-bold text-white mb-1">Principal Floor Protection</h5>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Stakers are backed by $1.425M in real tokenized <strong className="text-white">Nvidia ($NVDA)</strong> shares. If crypto token prices fluctuate, your locked position maintains a hard mathematical floor guaranteed by the underlying US equity treasury.
+                    Stakers are backed by real tokenized <strong className="text-white">Nvidia ($NVDA)</strong> shares held in on-chain escrow. If crypto token prices fluctuate, your locked position maintains a hard mathematical floor guaranteed by the underlying US equity treasury.
                   </p>
                 </div>
               </div>
@@ -177,38 +177,38 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
             <div className="space-y-6 text-sm text-gray-300 leading-relaxed">
               <div>
                 <span className="text-xs text-green-400 uppercase font-bold tracking-widest block mb-1">
-                  Ecosystem Economy
+                  1 Billion Fixed Supply
                 </span>
                 <h3 className="text-2xl font-black text-white tracking-tight">
-                  Beyond Collateral: The $ROBYN Token Engine
+                  $ROBYN Token Utility & Mathematics
                 </h3>
               </div>
 
               <p>
-                The collateral vault is only the foundational layer. The <strong className="text-white">$ROBYN token</strong> powers the broader autonomous operating system across the Robinhood Chain ecosystem:
+                With a strictly fixed supply of <strong className="text-white">1,000,000,000 $ROBYN</strong> tokens, the protocol uses transparent mathematical formulas to reward long-term stakers and liquidity providers:
               </p>
 
               <div className="space-y-3 pt-2">
                 {[
                   {
-                    title: '1. Protocol Revenue Sweeping & Fee Share',
-                    desc: 'Every algorithmic arbitrage run by the HyperSpeed Engine and every take-profit sweep charges a micro-protocol fee. 50% of all accumulated fees are autonomously redistributed to $ROBYN stakers.',
+                    title: '1. Weighted Share Pool Math (P_i = W_i / W_total)',
+                    desc: 'Locking tokens for longer durations multiplies your staking weight from 1.0x up to 2.5x, granting a larger percentage of all distributed stock dividends and collateral.',
                   },
                   {
-                    title: '2. Sub-50ms VIP Execution Lanes',
-                    desc: 'High-frequency traders and sniper bots staking $ROBYN gain access to dedicated priority WebSocket channels, ensuring their transactions are sequenced at the absolute head of 100ms Robinhood blocks.',
+                    title: '2. Sub-50ms VIP Execution Channels',
+                    desc: 'High-frequency traders staking $ROBYN gain access to dedicated priority WebSocket channels, ensuring their transactions are sequenced at the absolute head of 100ms Robinhood blocks.',
                   },
                   {
-                    title: '3. Collateral Minting Super-Multipliers',
-                    desc: 'Stakers who pair $ROBYN with their locked ETH unlock an exclusive 3.5x boost on their US stock collateral allocation, maximizing their share of the $1.425M NVDA treasury.',
+                    title: '3. Collateral Escrow Super-Multipliers',
+                    desc: 'Stakers who pair $ROBYN with their locked ETH unlock an exclusive boost on their US stock collateral allocation, maximizing their share of the NVDA treasury.',
                   },
                   {
                     title: '4. Autonomous Zero-Gas Subsidies (ERC-4337)',
                     desc: '$ROBYN acts as gas fuel in account-abstraction paymasters. Users holding a minimum tier of $ROBYN execute transactions with zero gas fees across all Robyn dApps.',
                   },
                   {
-                    title: '5. AI Strategy & Quant Marketplace',
-                    desc: 'External developers can publish automated trading models onto Robyn OS. Users subscribe to these swarms by locking $ROBYN, creating continuous token demand.',
+                    title: '5. Concentrated Liquidity Dynamic Rebalancing (CLM)',
+                    desc: 'Autonomous neural LP management continuously shifts tick ranges around Robinhood retail volume to capture maximum trading fee velocity.',
                   },
                 ].map((item) => (
                   <div key={item.title} className="p-4 bg-white/[0.02] rounded-xl border border-white/5">
@@ -240,36 +240,24 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
                   </div>
                   <ul className="text-xs text-gray-300 list-disc list-inside space-y-1">
                     <li>Production Web3 dApp with MetaMask & Phantom integration</li>
-                    <li>Verified RobinhoodCollateralVault.sol with $1.425M NVDA backing</li>
-                    <li>Live DexScreener Real-Time Market Cap Terminal</li>
+                    <li>Verified RobinhoodCollateralVault.sol smart contract on Robinhood Chain</li>
+                    <li>Transparent 1B Fixed Supply Mathematical Simulator</li>
                     <li>Sub-100ms Arbitrum Orbit Nitro deployment scripts</li>
                   </ul>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
                   <h5 className="font-bold text-white text-sm mb-1">Phase 2: Multi-Stock Equity Basket (Q3-Q4 2026)</h5>
-                  <ul className="text-xs text-gray-400 list-disc list-inside space-y-1">
-                    <li>Expansion from NVDA to Apple ($AAPL), Tesla ($TSLA), and S&P 500 ($SPY)</li>
-                    <li>Dynamic portfolio rebalancer between tech growth and high-yield dividend stocks</li>
-                    <li>Launch of Equi-Meme Launchpad for stock-backed meme tokens</li>
-                  </ul>
+                  <p className="text-xs text-gray-400">
+                    Expand treasury backing beyond $NVDA to include tokenized Apple ($AAPL), Tesla ($TSLA), Microsoft ($MSFT), and S&P 500 ETF index funds ($SPY).
+                  </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
-                  <h5 className="font-bold text-white text-sm mb-1">Phase 3: Autonomous AI Hedge Fund Swarms (2027)</h5>
-                  <ul className="text-xs text-gray-400 list-disc list-inside space-y-1">
-                    <li>Decentralized copy-trading where Robyn Neural models trade autonomously</li>
-                    <li>RobynTradeProofOracle.sol on-chain cryptographic audit trail</li>
-                    <li>Institutional-grade API for quantitative trading firms</li>
-                  </ul>
-                </div>
-
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
-                  <h5 className="font-bold text-white text-sm mb-1">Phase 4: Cross-Chain Liquidity Ingestion (2027)</h5>
-                  <ul className="text-xs text-gray-400 list-disc list-inside space-y-1">
-                    <li>Cross-chain bridges routing Solana and Base liquidity into Robinhood Chain vaults</li>
-                    <li>Mobile consumer dApp with biometric session keys</li>
-                  </ul>
+                  <h5 className="font-bold text-white text-sm mb-1">Phase 3: Autonomous Hedging AI Swarm (2027)</h5>
+                  <p className="text-xs text-gray-400">
+                    Deploy decentralized keeper swarms on Robinhood Chain to execute algorithmic delta-neutral strategies between on-chain perps and off-chain stock orderbooks.
+                  </p>
                 </div>
               </div>
             </div>
@@ -280,46 +268,40 @@ export default function DocsPage({ onBackToApp }: { onBackToApp: () => void }) {
             <div className="space-y-6 text-sm text-gray-300 leading-relaxed">
               <div>
                 <span className="text-xs text-green-400 uppercase font-bold tracking-widest block mb-1">
-                  Integration & Code
+                  Open Source Engine
                 </span>
                 <h3 className="text-2xl font-black text-white tracking-tight">
-                  Developer Quickstart & GitHub SDK
+                  Developer Guide & On-Chain Integration
                 </h3>
               </div>
 
               <p>
-                Robyn OS - FW includes a complete Python and TypeScript SDK for programmatic interaction with the smart contracts and 100ms RPC:
+                Robyn OS - FW is 100% open source. Developers can interact with the verified smart contracts on Robinhood Chain using standard Web3 libraries (Viem, Ethers.js, Web3.py):
               </p>
 
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-gray-300 uppercase">1. Clone & Install SDK:</div>
-                <pre className="bg-black/80 border border-white/10 rounded-xl p-4 text-xs font-mono text-green-400 overflow-x-auto">
-{`git clone https://github.com/robynhood-fw/robyn-llm-framework.git
-cd robyn-llm-framework
-pip install -r requirements.txt`}
-                </pre>
+              <div className="rounded-xl bg-black border border-white/10 p-4 font-mono text-xs overflow-x-auto text-green-400 space-y-1">
+                <p className="text-gray-500">// Interact with Robinhood Collateral Vault</p>
+                <p>const VAULT_ADDRESS = "0x3cA8513cDF8a7863152d0E377f09CeFe6e4bE713"</p>
+                <p>const RPC_URL = "https://rpc.mainnet.chain.robinhood.com"</p>
+                <p>const CHAIN_ID = 4663 // Robinhood Chain Arbitrum Orbit</p>
               </div>
 
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-gray-300 uppercase">2. CLI Status & Telemetry:</div>
-                <pre className="bg-black/80 border border-white/10 rounded-xl p-4 text-xs font-mono text-green-400 overflow-x-auto">
-{`# Check Robinhood Chain 100ms status
-python -m robyn.cli status
-
-# Deploy Collateral Vault to Robinhood Chain
-uv run python scripts/deploy_vault.py`}
-                </pre>
-              </div>
-
-              <div className="pt-2">
+              <div className="flex flex-wrap gap-4 pt-4">
                 <a
                   href="https://github.com/robynhood-fw/robyn-llm-framework"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-black font-extrabold px-6 py-3 rounded-xl text-xs transition shadow-lg shadow-green-500/20"
+                  className="bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2.5 rounded-xl text-xs transition"
                 >
-                  <span>Explore Robyn Framework on GitHub</span>
-                  <span>↗</span>
+                  GitHub Repository ↗
+                </a>
+                <a
+                  href="https://robinhoodchain.blockscout.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/5 hover:bg-white/10 text-white border border-white/20 font-semibold px-5 py-2.5 rounded-xl text-xs transition"
+                >
+                  Blockscout Explorer ↗
                 </a>
               </div>
             </div>
