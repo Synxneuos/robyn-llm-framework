@@ -1,19 +1,17 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 import HeroBanner from '../components/HeroBanner'
-import DexScreenerTerminal from '../components/DexScreenerTerminal'
-import CollateralCalculator from '../components/CollateralCalculator'
+import AIAgentTerminal from '../components/AIAgentTerminal'
+import TokenomicsSimulator from '../components/TokenomicsSimulator'
 import VaultDashboard from '../components/VaultDashboard'
 import DocsPage from '../components/DocsPage'
 
 export default function App() {
-  const { isConnected, address } = useAccount()
+  const { isConnected } = useAccount()
   const [currentView, setCurrentView] = useState<'app' | 'docs'>('app')
   const [blockNumber, setBlockNumber] = useState<number | null>(null)
   const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
-  const [calcAmount, setCalcAmount] = useState<string>('')
-  const [calcDuration, setCalcDuration] = useState<number>(30)
 
   // Fetch real on-chain block number & gas price from Robinhood RPC
   useEffect(() => {
@@ -44,19 +42,17 @@ export default function App() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleApplyCalculator = (amount: string, days: number) => {
+  const scrollToSection = (id: string) => {
     setCurrentView('app')
-    setCalcAmount(amount)
-    setCalcDuration(days)
     setTimeout(() => {
-      const el = document.getElementById('vault-actions')
+      const el = document.getElementById(id)
       if (el) el.scrollIntoView({ behavior: 'smooth' })
     }, 100)
   }
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#040608] text-white selection:bg-green-500 selection:text-black">
-      {/* 1. Live Robinhood Nitro L2 Telemetry Ticker */}
+      {/* 1. Live Robinhood Nitro L2 Telemetry Status Bar */}
       <div className="bg-[#020d04] border-b border-green-500/20 text-xs py-2 px-4 text-green-300">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -73,6 +69,8 @@ export default function App() {
             <span className="font-mono">Gas: {gasPriceGwei} Gwei</span>
             <span className="text-green-500/40 hidden md:inline">|</span>
             <span className="text-gray-300 hidden md:inline">Latency: <strong className="text-green-400">100ms Orbit Nitro</strong></span>
+            <span className="text-green-500/40 hidden lg:inline">|</span>
+            <span className="text-gray-400 hidden lg:inline">Supply: <strong className="text-white font-mono">1,000,000,000 $ROBYN</strong></span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
@@ -80,7 +78,7 @@ export default function App() {
               onClick={() => setCurrentView('docs')}
               className="text-green-400 hover:text-green-300 font-bold flex items-center gap-1 underline"
             >
-              📄 Read Whitepaper & Docs ↗
+              📄 Whitepaper & Docs ↗
             </button>
             <a
               href="https://robinhoodchain.blockscout.com"
@@ -88,13 +86,13 @@ export default function App() {
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-green-300 flex items-center gap-1 font-semibold"
             >
-              Explorer ↗
+              Blockscout ↗
             </a>
           </div>
         </div>
       </div>
 
-      {/* 2. Top Navigation Bar */}
+      {/* 2. Sleek Robinhood-Style Top Navigation Bar */}
       <header className="border-b border-white/10 backdrop-blur-xl sticky top-0 z-50 bg-[#040608]/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div
@@ -126,23 +124,31 @@ export default function App() {
             <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-gray-300">
               <button
                 type="button"
-                onClick={() => setCurrentView('app')}
-                className={`transition ${currentView === 'app' ? 'text-green-400' : 'hover:text-white'}`}
+                onClick={() => scrollToSection('agent-terminal')}
+                className="hover:text-green-400 transition"
+              >
+                AI Terminal
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection('tokenomics-sim')}
+                className="hover:text-green-400 transition"
+              >
+                1B Tokenomics
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection('vault-actions')}
+                className="hover:text-green-400 transition"
               >
                 Staking Vault
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setCurrentView('app')
-                  setTimeout(() => {
-                    const el = document.getElementById('dex-terminal')
-                    if (el) el.scrollIntoView({ behavior: 'smooth' })
-                  }, 100)
-                }}
+                onClick={() => scrollToSection('architecture')}
                 className="hover:text-green-400 transition"
               >
-                $ROBYN Terminal
+                Architecture
               </button>
               <button
                 type="button"
@@ -154,7 +160,7 @@ export default function App() {
                 }`}
               >
                 <span>Documentation</span>
-                <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.2 rounded">NEW</span>
+                <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.2 rounded font-bold">V1.0</span>
               </button>
             </nav>
 
@@ -168,7 +174,7 @@ export default function App() {
       </header>
 
       {/* 3. Main Dashboard Body */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-14">
         {currentView === 'docs' ? (
           <DocsPage onBackToApp={() => setCurrentView('app')} />
         ) : (
@@ -176,17 +182,17 @@ export default function App() {
             {/* Hero Section */}
             <HeroBanner />
 
-            {/* DexScreener Live Terminal Section */}
-            <section id="dex-terminal">
-              <DexScreenerTerminal />
+            {/* Autonomous AI Agent OS Terminal */}
+            <section id="agent-terminal">
+              <AIAgentTerminal />
             </section>
 
-            {/* Collateral & Yield Calculator */}
-            <section id="calculator">
-              <CollateralCalculator onSelectAmount={handleApplyCalculator} />
+            {/* Transparent 1B Tokenomics & Collateral Math Simulator */}
+            <section id="tokenomics-sim">
+              <TokenomicsSimulator />
             </section>
 
-            {/* Live Staking & Dividend Vault */}
+            {/* Live On-Chain Staking & Dividend Vault */}
             <section>
               <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
@@ -203,7 +209,7 @@ export default function App() {
                   </span>
                 )}
               </div>
-              <VaultDashboard presetAmount={calcAmount} presetDuration={calcDuration} />
+              <VaultDashboard />
             </section>
 
             {/* Architecture & 5 Breakthrough Modules Showcase */}
@@ -256,7 +262,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. Footer */}
+      {/* 4. Sleek Minimalist Footer */}
       <footer className="border-t border-white/10 bg-[#020503] py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-3">
@@ -272,7 +278,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <button
               onClick={() => setCurrentView('docs')}
-              className="text-green-400 hover:underline"
+              className="text-green-400 hover:underline font-semibold"
             >
               Documentation
             </button>
@@ -298,7 +304,7 @@ export default function App() {
               rel="noopener noreferrer"
               className="hover:text-green-400 transition"
             >
-              GitHub (Robyn FW)
+              GitHub
             </a>
             <a
               href="https://huggingface.co/robynhooood/Robyn-Agent"

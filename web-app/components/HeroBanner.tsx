@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React from 'react'
 
@@ -50,16 +50,16 @@ export default function HeroBanner() {
 
           {/* Core explanation */}
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-xl font-normal">
-            The flagship autonomous financial OS bridging <strong className="text-white">TradFi Wall Street Equity Collateral</strong> with <strong className="text-white">Degen On-Chain Liquidity</strong>. Lock tokens or ETH to accumulate real <strong className="text-green-400">$NVDA</strong> treasury backing and receive streaming quarterly dividends directly in your Web3 wallet.
+            Engineered natively on Robinhood Chain (<strong className="text-white">Arbitrum Orbit 100ms L2</strong>). Robyn OS fuses sub-second EVM algorithmic agency with <strong className="text-white">TradFi Wall Street Equity Collateral</strong> escrow. Programmatic yield, automated $NVDA equity floor backing, and natural language on-chain execution.
           </p>
 
-          {/* Feature Badges */}
+          {/* Tech Feature Badges */}
           <div className="flex flex-wrap gap-2.5 pt-2">
             {[
-              { icon: '⚡', label: '100ms Sub-Second Blocks' },
-              { icon: '🏛️', label: '$1.425M NVDA Treasury' },
-              { icon: '💵', label: 'Up to 12% Staking APY' },
-              { icon: '🛡️', label: 'Guaranteed Floor Protection' },
+              { icon: '⚡', label: '100ms Sub-Second Orbit Nitro' },
+              { icon: '🏛️', label: 'TradFi Equity Escrow ($NVDA)' },
+              { icon: '🧠', label: 'Autonomous EVM Agent OS' },
+              { icon: '💎', label: '1,000,000,000 Total Supply' },
             ].map((b) => (
               <span
                 key={b.label}
@@ -74,26 +74,25 @@ export default function HeroBanner() {
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap gap-4 pt-4">
             <a
-              href="#vault-actions"
+              href="#agent-terminal"
               className="bg-green-500 hover:bg-green-400 text-black font-extrabold px-7 py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-500/30 flex items-center gap-2"
             >
-              <span>Launch Staking Vault</span>
+              <span>Launch AI Agent Terminal</span>
+              <span>🤖</span>
+            </a>
+            <a
+              href="#vault-actions"
+              className="bg-white/5 hover:bg-white/10 text-white border border-white/20 px-6 py-3.5 rounded-xl text-sm font-semibold transition backdrop-blur-sm flex items-center gap-2"
+            >
+              <span>Collateral Vault</span>
               <span>↓</span>
             </a>
             <a
-              href="#dex-terminal"
+              href="#tokenomics-sim"
               className="bg-white/5 hover:bg-white/10 text-white border border-white/20 px-6 py-3.5 rounded-xl text-sm font-semibold transition backdrop-blur-sm flex items-center gap-2"
             >
-              <span>$ROBYN DexScreener</span>
-              <span>📈</span>
-            </a>
-            <a
-              href="https://robinhoodchain.blockscout.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-green-400 text-sm font-medium self-center underline ml-2 transition"
-            >
-              Blockscout Explorer ↗
+              <span>1B Math Simulator</span>
+              <span>🧮</span>
             </a>
           </div>
         </div>
@@ -117,8 +116,8 @@ export default function HeroBanner() {
             <div className="absolute -top-3 -left-4 bg-black/90 border border-green-500/40 rounded-xl px-3.5 py-2 shadow-xl backdrop-blur-md flex items-center gap-2 text-xs">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
               <div>
-                <div className="text-[10px] text-gray-400 uppercase font-semibold">Treasury Asset</div>
-                <div className="font-bold text-white text-xs">$NVDA (11,445 Shs)</div>
+                <div className="text-[10px] text-gray-400 uppercase font-semibold">EVM Engine</div>
+                <div className="font-bold text-white text-xs">Autonomous Agent Active</div>
               </div>
             </div>
 
@@ -134,23 +133,23 @@ export default function HeroBanner() {
         </div>
       </div>
 
-      {/* Ticker strip at bottom of banner */}
+      {/* Tech specs strip at bottom of banner */}
       <div className="mt-10 pt-4 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
         <div className="text-center sm:text-left">
-          <span className="text-gray-500 block text-[10px] uppercase font-bold">Protocol Name</span>
-          <span className="text-white font-bold text-sm">Robyn OS - FW</span>
+          <span className="text-gray-500 block text-[10px] uppercase font-bold">Protocol Architecture</span>
+          <span className="text-white font-bold text-sm">Robyn Autonomous OS</span>
         </div>
         <div className="text-center sm:text-left">
-          <span className="text-gray-500 block text-[10px] uppercase font-bold">Network Speed</span>
+          <span className="text-gray-500 block text-[10px] uppercase font-bold">L2 Block Latency</span>
           <span className="text-green-400 font-bold text-sm">100ms Arbitrum Orbit</span>
         </div>
         <div className="text-center sm:text-left">
-          <span className="text-gray-500 block text-[10px] uppercase font-bold">Dividends Streamed</span>
-          <span className="text-white font-bold text-sm">$46,920 Paid Out</span>
+          <span className="text-gray-500 block text-[10px] uppercase font-bold">Total Genesis Supply</span>
+          <span className="text-white font-bold text-sm">1,000,000,000 $ROBYN</span>
         </div>
         <div className="text-center sm:text-left">
-          <span className="text-gray-500 block text-[10px] uppercase font-bold">Wallet Connectors</span>
-          <span className="text-green-400 font-bold text-sm">MetaMask · Phantom · WC</span>
+          <span className="text-gray-500 block text-[10px] uppercase font-bold">Network & Consensus</span>
+          <span className="text-green-400 font-bold text-sm">Robinhood Chain (ID: 4663)</span>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi'
@@ -146,31 +146,52 @@ export default function VaultDashboard({ presetAmount, presetDuration }: VaultDa
 
   return (
     <div id="vault-actions" className="space-y-6">
+      {/* Genesis Pre-Launch Status Banner */}
+      <div className="rounded-2xl bg-black/50 border border-green-500/20 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+          <span className="text-gray-300">
+            <strong className="text-white">Smart Contract Verified:</strong>{' '}
+            <a
+              href={`https://robinhoodchain.blockscout.com/address/${VAULT_ADDRESS}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-green-400 hover:underline"
+            >
+              {VAULT_ADDRESS}
+            </a>
+          </span>
+        </div>
+        <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full border border-green-500/30 text-[11px] font-bold">
+          Genesis Stage · Pre-Configured On-Chain
+        </span>
+      </div>
+
       {/* Global Vault Statistics Header */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
             label: 'Total Locked Liquidity',
-            value: totalLocked ? `${formatEthValue(totalLocked)} ETH` : '248.5 ETH',
-            sub: 'Staked in Collateral Pool',
+            value: totalLocked && totalLocked > BigInt(0) ? `${formatEthValue(totalLocked)} ETH` : '0.00 ETH',
+            sub: totalLocked && totalLocked > BigInt(0) ? 'Staked in Collateral Pool' : 'Awaiting Genesis Deposits',
             icon: '🔒',
           },
           {
             label: 'Treasury Stock Collateral',
-            value: totalTreasuryUsd ? formatUsd(totalTreasuryUsd) : '$1,425,000',
-            sub: 'Held in On-Chain Escrow',
+            value: totalTreasuryUsd && totalTreasuryUsd > BigInt(0) ? formatUsd(totalTreasuryUsd) : '$0.00',
+            sub: totalTreasuryUsd && totalTreasuryUsd > BigInt(0) ? 'Held in On-Chain Escrow' : 'Escrow Ready for Launch',
             icon: '🏦',
           },
           {
             label: 'Real NVDA Shares',
-            value: totalNvdaShares ? `${(Number(totalNvdaShares) / 1e18).toFixed(0)}` : '11,445',
-            sub: 'Backing Tokenized Equity',
+            value: totalNvdaShares && totalNvdaShares > BigInt(0) ? `${(Number(totalNvdaShares) / 1e18).toFixed(0)}` : '0',
+            sub: totalNvdaShares && totalNvdaShares > BigInt(0) ? 'Backing Tokenized Equity' : 'Treasury Escrow Standby',
             icon: '📈',
           },
           {
             label: 'Dividends Distributed',
-            value: totalDividends ? formatUsd(totalDividends) : '$46,920',
-            sub: 'Streamed to Stakers',
+            value: totalDividends && totalDividends > BigInt(0) ? formatUsd(totalDividends) : '$0.00',
+            sub: totalDividends && totalDividends > BigInt(0) ? 'Streamed to Stakers' : 'Activated Post-Genesis',
             icon: '💰',
           },
         ].map((stat) => (
