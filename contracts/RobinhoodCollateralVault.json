@@ -1,0 +1,413 @@
+{
+  "contractName": "RobinhoodCollateralVault",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_agentKeeper",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "dividendAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "DividendStreamDeposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "DividendsClaimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "addedStockUsd",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalCollateralUsd",
+          "type": "uint256"
+        }
+      ],
+      "name": "StockCollateralAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "unlockTime",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "duration",
+          "type": "uint256"
+        }
+      ],
+      "name": "TokensLocked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "TokensUnlocked",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "accDividendPerShare",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "addedUsd",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "addedNvdaShares",
+          "type": "uint256"
+        }
+      ],
+      "name": "addStockCollateral",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "agentKeeper",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "calculatePendingDividends",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimDividends",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "payout",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "depositDividends",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getUserVaultOverview",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "lockedAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "unlockTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "userShareBps",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stockCollateralUsd",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stockSharesNvda",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "pendingDividends",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "guaranteedFloorPriceUsd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "durationDays",
+          "type": "uint256"
+        }
+      ],
+      "name": "lockTokens",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalDividendsStreamed",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalStockSharesNvda",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalTokensLocked",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalTreasuryStockUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "unlockTokens",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userClaimedDividends",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userPositions",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "unlockTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lockDuration",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "rewardDebt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "sharesMinted",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": "0x60c060405234801561000f575f80fd5b50604051610e79380380610e7983398101604081905261002e9161006e565b336080526001600160a01b031660a0526a012dc167a04a6c38a0000060015569026c6f480dca89b400006002556909ef89cdcf2f9020000060035561009b565b5f6020828403121561007e575f80fd5b81516001600160a01b0381168114610094575f80fd5b9392505050565b60805160a051610da16100d85f395f81816101fc015281816104410152610b6a01525f81816102af015281816104730152610b9c0152610da15ff3fe6080604052600436106100f2575f3560e01c806392b46e5b11610087578063cb67f94811610057578063cb67f94814610323578063dc5bf96114610342578063defa92ee14610356578063f06d4dda1461035e575f80fd5b806392b46e5b146102d157806395e77056146102e6578063a25983e5146102fb578063b9ae44141461030e575f80fd5b8063629026fb116100c2578063629026fb146101eb578063668038e01461023657806384edffd71461024a5780638da5cb5b1461029e575f80fd5b80630aa617e6146100fd57806356d1c1631461013b578063613cf4201461015a578063618ac003146101ca575f80fd5b366100f957005b5f80fd5b348015610108575f80fd5b50610128610117366004610c66565b60066020525f908152604090205481565b6040519081526020015b60405180910390f35b348015610146575f80fd5b50610128610155366004610c66565b610373565b348015610165575f80fd5b506101a2610174366004610c66565b60056020525f9081526040902080546001820154600283015460038401546004909401549293919290919085565b604080519586526020860194909452928401919091526060830152608082015260a001610132565b3480156101d5575f80fd5b506101e96101e4366004610c86565b610436565b005b3480156101f6575f80fd5b5061021e7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b039091168152602001610132565b348015610241575f80fd5b5061012861054b565b348015610255575f80fd5b50610269610264366004610c66565b61067a565b604080519788526020880196909652948601939093526060850191909152608084015260a083015260c082015260e001610132565b3480156102a9575f80fd5b5061021e7f000000000000000000000000000000000000000000000000000000000000000081565b3480156102dc575f80fd5b5061012860045481565b3480156102f1575f80fd5b5061012860025481565b6101e9610309366004610ca6565b61077c565b348015610319575f80fd5b5061012860015481565b34801561032e575f80fd5b506101e961033d366004610c66565b6109b5565b34801561034d575f80fd5b506101285f5481565b6101e9610b5f565b348015610369575f80fd5b5061012860035481565b6001600160a01b0381165f908152600560209081526040808320815160a0810183528154808252600183015494820194909452600282015492810192909252600381015460608301526004015460808201529015806103d157505f54155b156103de57505f92915050565b80515f906103e8906103f1906030610cea565b6103fb9190610d07565b6001600160a01b0385165f90815260066020526040902054909150808211610423575f61042d565b61042d8183610d26565b95945050505050565b336001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001614806104955750336001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016145b6104dc5760405162461bcd60e51b815260206004820152601360248201527227b7363c9030b3b2b73a1037b91037bbb732b960691b60448201526064015b60405180910390fd5b8160015f8282546104ed9190610d39565b925050819055508060025f8282546105059190610d39565b90915550506001546040805184815260208101929092527f659ae6225a5a19159faec330e9bd74c78bd412f678fbf7469347dc69f1ef37b2910160405180910390a15050565b335f908152600560205260408120805461059a5760405162461bcd60e51b815260206004820152601060248201526f4e6f206c6f636b656420746f6b656e7360801b60448201526064016104d3565b6105a333610373565b91505f82116105eb5760405162461bcd60e51b81526020600482015260146024820152734e6f2070656e64696e67206469766964656e647360601b60448201526064016104d3565b335f9081526006602052604081208054849290610609908490610d39565b909155505047821161064157604051339083156108fc029084905f818181858888f1935050505015801561063f573d5f803e3d5ffd5b505b60405182815233907f16b8533c95f66ab8c192c98ddcf5031bcb3ee6f4022988bdadd57d3422da30739060200160405180910390a25090565b6001600160a01b0381165f908152600560209081526040808320815160a0810183528154808252600183015494820185905260028301549382019390935260038201546060820152600490910154608082015283549193918291829182918291158015906106e85750805115155b15610765575f5481516106fd90612710610cea565b6107079190610d07565b95506127108660015461071a9190610cea565b6107249190610d07565b9450612710866002546107379190610cea565b6107419190610d07565b815190945061075886670de0b6b3a7640000610cea565b6107629190610d07565b91505b61076e89610373565b925050919395979092949650565b60078110156107c25760405162461bcd60e51b81526020600482015260126024820152714d696e206c6f636b2069732037206461797360701b60448201526064016104d3565b8134156107d05750346108a1565b6001600160a01b038416158015906107e757505f83115b15610866576040516323b872dd60e01b8152336004820152306024820152604481018490526001600160a01b038516906323b872dd906064016020604051808303815f875af115801561083c573d5f803e3d5ffd5b505050506040513d601f19601f820116820180604052508101906108609190610d4c565b506108a1565b60405162461bcd60e51b815260206004820152601060248201526f16995c9bc81b1bd8dac8185b5bdd5b9d60821b60448201526064016104d3565b335f908152600560205260409020606461016d84106108c2575060fa6108de565b605a84106108d2575060af6108de565b601e84106108de5750607d5b5f60646108eb8386610cea565b6108f59190610d07565b905083835f015f8282546109099190610d39565b9091555061091c90508562015180610cea565b6109269042610d39565b6001840155600283018590556004830180548291905f90610948908490610d39565b92505081905550835f8082825461095f9190610d39565b90915550506001830154604080518681526020810192909252810186905233907f90e20a62e0f2a608d33bd96a4e15cb853006a15caf4455f373b7b55de520b68c9060600160405180910390a250505050505050565b335f90815260056020526040902080546109ff5760405162461bcd60e51b815260206004820152600b60248201526a2737903837b9b4ba34b7b760a91b60448201526064016104d3565b8060010154421015610a535760405162461bcd60e51b815260206004820152601960248201527f4c6f636b206475726174696f6e206e6f7420657870697265640000000000000060448201526064016104d3565b80545f8083556004830181905580548291908190610a72908490610d26565b90915550506001600160a01b038316610ab557604051339082156108fc029083905f818181858888f19350505050158015610aaf573d5f803e3d5ffd5b50610b25565b60405163a9059cbb60e01b8152336004820152602481018290526001600160a01b0384169063a9059cbb906044016020604051808303815f875af1158015610aff573d5f803e3d5ffd5b505050506040513d601f19601f82011682018060405250810190610b239190610d4c565b505b60405181815233907fe7b379c6c1fa169e9079c25e9143b127637eef8ec8c9d5c06ddb4ab3e11958889060200160405180910390a2505050565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161480610bbe5750336001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016145b610c005760405162461bcd60e51b815260206004820152601360248201527227b7363c9030b3b2b73a1037b91037bbb732b960691b60448201526064016104d3565b3460035f828254610c119190610d39565b90915550506040513481527f71d0c74bddbe7de63bd4e210f82335517e390feaacf279ea515116565cba7c259060200160405180910390a1565b80356001600160a01b0381168114610c61575f80fd5b919050565b5f60208284031215610c76575f80fd5b610c7f82610c4b565b9392505050565b5f8060408385031215610c97575f80fd5b50508035926020909101359150565b5f805f60608486031215610cb8575f80fd5b610cc184610c4b565b95602085013595506040909401359392505050565b634e487b7160e01b5f52601160045260245ffd5b8082028115828204841417610d0157610d01610cd6565b92915050565b5f82610d2157634e487b7160e01b5f52601260045260245ffd5b500490565b81810381811115610d0157610d01610cd6565b80820180821115610d0157610d01610cd6565b5f60208284031215610d5c575f80fd5b81518015158114610c7f575f80fdfea26469706673582212206735a8d4951274593a09c38863ebb1e626375a3ae09f05fefb98223f017cafb764736f6c63430008140033"
+}

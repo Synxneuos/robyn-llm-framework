@@ -177,6 +177,33 @@ python examples/demo_100ms_arbitrage.py
 
 # Demo 4 & 5: AI Hedge Fund Manager & Hype Oracle
 python examples/demo_autonomous_hedge_fund.py
+### 4. 🌐 Real Web3 Collateral Vault dApp (MetaMask & Phantom)
+
+A production Web3 dApp built with **Vite + React + Wagmi + RainbowKit + Viem**:
+
+```bash
+cd web-app
+npm install
+npm run dev
+# Opens on http://localhost:3000 with real MetaMask / Phantom wallet connection
+```
+
+Features:
+- **Real Injected & Multi-Chain Wallet Connect**: Full support for MetaMask, Phantom, Coinbase Wallet, and WalletConnect.
+- **Robinhood Chain Native**: Configured with Chain ID `4663` (Mainnet) and `46630` (Testnet) with live 100ms telemetry.
+- **Autonomous Vault Control**: Lock tokens/ETH with duration multipliers (up to 2.5x), track real-time NVDA treasury backing, and claim streaming stock dividends directly on-chain.
+
+### 5. ⛓️ On-Chain Smart Contract Compilation & Deployment
+
+Compile and deploy the verified `RobinhoodCollateralVault.sol` contract directly to Robinhood Chain:
+
+```bash
+# Compile Solidity contracts with Solc 0.8.20
+uv run python scripts/compile_contracts.py
+
+# Deploy to Robinhood Chain Mainnet (or Testnet)
+$env:PRIVATE_KEY="your_private_key_here"
+uv run python scripts/deploy_vault.py
 ```
 
 ---
