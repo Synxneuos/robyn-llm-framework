@@ -7,6 +7,7 @@ __author__ = "Robyn Hood"
 
 from robyn.core.agent import RobynAgent
 from robyn.core.llm import RobynLLM
+from robyn.chain.client import RobinhoodChainClient, RobinhoodClient
 from robyn.modules.hedging_vault import MemeToStockHedger
 from robyn.modules.equi_launchpad import EquiMemeLaunchpad
 from robyn.modules.flash_arbitrage import FlashArbitrageEngine
@@ -20,6 +21,8 @@ from robyn.modules.telegram_sniper import TelegramSniperBot
 __all__ = [
     "RobynAgent",
     "RobynLLM",
+    "RobinhoodChainClient",
+    "RobinhoodClient",
     "MemeToStockHedger",
     "EquiMemeLaunchpad",
     "FlashArbitrageEngine",

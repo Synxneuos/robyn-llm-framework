@@ -42,3 +42,7 @@ class RobinhoodChainClient:
             "active_dexes": ["Pons Launchpad", "Uniswap V3", "KyberSwap"],
             "rwa_enabled": True
         }
+
+# Convenient Developer Alias
+RobinhoodClient = RobinhoodChainClient
+
