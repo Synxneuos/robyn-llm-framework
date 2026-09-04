@@ -54,7 +54,7 @@ export default function FrameworkHero({ onExplore }: HeroProps) {
             </div>
             <span className="text-[#30363D]">·</span>
             <div>
-              <span className="text-white font-semibold">0.5B</span> Hermes Tool LLM
+              <span className="text-white font-semibold">0.5B</span> Robyn Engine
             </div>
             <span className="text-[#30363D]">·</span>
             <div>

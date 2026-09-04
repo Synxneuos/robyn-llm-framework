@@ -11,8 +11,8 @@ const PIPELINE_STEPS = [
   {
     step: '02',
     name: 'REASONING',
-    title: 'Robyn Neural LLM Core',
-    desc: '0.5B Hermes fine-tuned model decomposes multi-step natural language into structured tool calls.',
+    title: 'Robyn Engine Core',
+    desc: 'Robyn Engine decomposes multi-step natural language into structured deterministic tool calls.',
     detail: '<tool_call> JSON schema validation',
   },
   {

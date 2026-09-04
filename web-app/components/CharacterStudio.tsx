@@ -163,7 +163,7 @@ export default function CharacterStudio() {
           </div>
 
           <div className="px-4 py-2.5 bg-[#020406] hairline-border-t font-mono text-[11px] text-[#8B949E] flex items-center justify-between">
-            <span>Model: Hermes 0.5B Tool LLM</span>
+            <span>Model: Robyn Engine</span>
             <span className="text-[#00C805]">Account: ERC-4337</span>
           </div>
         </div>

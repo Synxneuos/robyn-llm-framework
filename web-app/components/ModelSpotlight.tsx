@@ -38,7 +38,7 @@ export default function ModelSpotlight() {
             </div>
             <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
               <span className="text-[#6E7681] text-[10px] block">TOOL FORMAT</span>
-              <span className="text-[#00C805] font-bold text-sm mt-0.5 block">Hermes JSON</span>
+              <span className="text-[#00C805] font-bold text-sm mt-0.5 block">Robyn Engine JSON</span>
             </div>
             <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
               <span className="text-[#6E7681] text-[10px] block">INFERENCE SPEED</span>
@@ -57,7 +57,7 @@ export default function ModelSpotlight() {
         {/* Schema Preview */}
         <div className="lg:col-span-6 bg-[#05070A] hairline-border rounded-xl p-5 sm:p-6 font-mono text-xs space-y-2">
           <div className="flex items-center justify-between pb-2 hairline-border-b font-mono text-[11px] text-[#8B949E]">
-            <span>HERMES_TOOL_SCHEMA</span>
+            <span>ROBYN_TOOL_SCHEMA</span>
             <span className="text-[#00C805]">DETERMINISTIC</span>
           </div>
           <pre className="text-[#C9D1D9] text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap bg-[#020406] p-4 rounded-lg hairline-border">
