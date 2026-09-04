@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="assets/robyn_avatar.jpg" width="260" style="border-radius: 50%; box-shadow: 0 0 35px rgba(34, 197, 94, 0.4);" alt="Robyn Agent Avatar" />
+<img src="assets/robyn_avatar.jpg" width="280" style="border-radius: 24px; box-shadow: 0 0 45px rgba(0, 200, 5, 0.45); border: 2px solid #00C805;" alt="Robyn Agent Official Avatar" />
 
-# 🏹 Robyn LLM Framework (RobynOS)
+# 🏹 Robyn LLM Framework (RobynOS - FW)
 ### *The Autonomous AI Agent & Real-World EVM Action Engine for Robinhood Chain*
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Chain: Robinhood L2](https://img.shields.io/badge/Network-Robinhood%20Chain%20(Orbit)-00C805.svg)](https://robinhood.com)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-00C805.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Network: Robinhood Chain](https://img.shields.io/badge/Network-Robinhood%20Chain%20(Orbit%20Nitro)-00C805.svg)](https://robinhoodchain.blockscout.com)
 [![HuggingFace Model](https://img.shields.io/badge/Model-robynhooood%2FRobyn--Agent-orange.svg)](https://huggingface.co/robynhooood/Robyn-Agent)
 [![Latency: Sub--100ms](https://img.shields.io/badge/Latency-100ms%20Block%20Ready-brightgreen.svg)](#flash-arbitrage)
 [![Architecture: Robyn-Neural](https://img.shields.io/badge/Architecture-Robyn--0.5B-blueviolet.svg)](#overview)
@@ -23,7 +23,39 @@ Unlike traditional chatbots, **Robyn** has direct on-chain agency: an autonomous
 
 ---
 
-## 🚀 5 Breakthrough Breakthrough Modules (First in Web3)
+## 🚀 1-Command Installation
+
+You can install the complete **Robyn Framework** directly via `pip` in one single command:
+
+```bash
+# ⚡ 1-Command Direct Install from GitHub
+pip install git+https://github.com/robynhood-fw/robyn-llm-framework.git
+
+# Or install in editable / developer mode:
+git clone https://github.com/robynhood-fw/robyn-llm-framework.git
+cd robyn-llm-framework
+pip install -e .
+```
+
+### ⚡ 3-Line Python Quickstart
+
+```python
+import robyn
+from robyn import RobynAgent, RobinhoodClient
+
+# Connect to Robinhood Chain (Arbitrum Orbit, 100ms Nitro L2)
+client = RobinhoodClient()
+
+# Launch autonomous AI agent with Robyn Neural 0.5B model
+agent = RobynAgent(model="robynhooood/Robyn-Agent", client=client)
+
+# Execute autonomous cycle
+agent.run_autonomous_cycle()
+```
+
+---
+
+## 🚀 5 Breakthrough AI Modules (First in Web3)
 
 ```
                        ┌──────────────────────────────────────────────┐
@@ -71,54 +103,7 @@ Unlike traditional chatbots, **Robyn** has direct on-chain agency: an autonomous
 
 ### 5. 📡 On-Chain Hype & Sentiment Oracle
 * Scans real-time social metrics (Twitter/X, WallStreetBets, DEX volumes) and computes an on-chain sentiment score (0–100) published to smart contracts for lending rate adjustments on Morpho.
-
----
-
-## 📦 Project Structure
-
-```
-robyn-llm-framework/
-├── assets/
-│   └── robyn_avatar.jpg          # Official Robyn character artwork
-├── contracts/
-│   ├── EquiMemeToken.sol         # Stock-backed token smart contract
-│   ├── MemeToStockVault.sol      # Autonomous profit hedging vault contract
-│   ├── HyperSpeedFactory.sol     # Minimal proxy & zero-approval DEX engine
-│   ├── RobynCLMVault.sol         # Autonomous Concentrated Liquidity (CLM) vault
-│   └── RobynTradeProofOracle.sol # Verifiable on-chain action audit registry
-├── robyn/
-│   ├── chain/
-│   │   ├── client.py             # Robinhood Orbit RPC & telemetry client
-│   │   ├── wallet.py             # EVM wallet & ERC-4337 session keys
-│   │   └── dex.py                # Uniswap V3 & Pons DEX swap router
-│   ├── core/
-│   │   ├── llm.py                # Robyn-Agent Hermes tool-calling parser
-│   │   └── agent.py              # Central autonomous loop & coordinator
-│   ├── modules/
-│   │   ├── hedging_vault.py      # Meme-to-Stock hedging engine
-│   │   ├── equi_launchpad.py     # Stock-backed meme token launcher
-│   │   ├── flash_arbitrage.py    # 100ms flash arbitrage engine
-│   │   ├── portfolio_manager.py  # AI hedge fund manager
-│   │   ├── hype_oracle.py        # On-chain sentiment oracle
-│   │   ├── hyper_speed_engine.py # Sub-100ms launcher & trader (<$0.0009)
-│   │   ├── clm_vault.py          # AI Uniswap V3 concentrated liquidity rebalancer
-│   │   ├── verifiable_proofs.py  # Cryptographic decision audit receipts
-│   │   └── telegram_sniper.py    # Fast Telegram sniper & trading bot
-│   ├── cli.py                    # Interactive terminal CLI
-│   └── config.py                 # Configuration & environment variables
-├── examples/
-│   ├── benchmark_solana_vs_robinhood.py # Head-to-head performance benchmark
-│   ├── demo_clm_auto_yield.py           # Concentrated liquidity auto-yield demo
-│   ├── demo_verifiable_audit_proofs.py  # On-chain cryptographic receipts demo
-│   ├── demo_telegram_bot_simulator.py   # Telegram sniper bot simulator
-│   ├── demo_hedge_vault.py
-│   ├── demo_launch_stock_backed_meme.py
-│   ├── demo_100ms_arbitrage.py
-│   └── demo_autonomous_hedge_fund.py
-├── pyproject.toml
-├── requirements.txt
-└── .env.example
-```
+* **Smart Contract:** [`contracts/RobynTradeProofOracle.sol`](contracts/RobynTradeProofOracle.sol)
 
 ---
 
@@ -134,50 +119,32 @@ By combining **Arbitrum Orbit's 100ms Nitro Sequencer** with **ERC-1167 Minimal 
 | **Dropped / Reverted Tx Rate**| 15% - 40% (high congestion) | **0.0% (FIFO Sequencer Pipeline)** | 🛡️ **Zero Dropped Txs** |
 | **Approval Overhead** | Separate ATA creation | **Zero (Batched Atomic Multicall)** | 🚀 **1-Click Execution** |
 
-### How It Works:
-1. **ERC-1167 Clones (`contracts/HyperSpeedFactory.sol`):** Instead of deploying 1.5M gas bytecodes, tokens clone a master implementation in ~41k gas.
-2. **Direct Sequencer Streaming:** Bypasses public mempool delays to achieve verifiable **sub-80ms pre-confirmations**.
-3. **Zero-Approval Execution:** Buys, sells, and liquidity injections execute atomically without paying for a prior `approve()` transaction.
+---
+
+## 💻 CLI Usage
+
+The framework includes a powerful command-line interface registered globally upon installation:
 
 ```bash
-# Run the live head-to-head benchmark
-python examples/benchmark_solana_vs_robinhood.py
+# Check wallet & 100ms block telemetry
+robyn status
+
+# Set up an automated hedging rule
+robyn hedge --meme 0xCASHCAT --stock NVDA --pump 2.5 --percent 30
+
+# Launch a stock-backed meme token
+robyn launch --name "Sherwood Bull" --symbol SBULL --stock NVDA --percent 10
+
+# Scan & execute 100ms flash arbitrage
+robyn arb --pair CASHCAT/ETH
+
+# Send natural language instructions to Robyn-Agent
+robyn prompt "Robyn, check if NVDA is trending and rebalance my vault"
 ```
 
 ---
 
-## ⚡ Quickstart
-
-### 1. Installation
-
-```bash
-git clone https://github.com/robynhoood/robyn-llm-framework-.git
-cd robyn-llm-framework-
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env with your Robinhood RPC or use built-in high-fidelity simulation
-```
-
-### 3. Run All Demos Instantly
-
-```bash
-# Demo 1: Autonomous Meme-to-Stock Profit Hedging
-python examples/demo_hedge_vault.py
-
-# Demo 2: Launch a Stock-Backed Meme Token
-python examples/demo_launch_stock_backed_meme.py
-
-# Demo 3: 100ms Sub-Second Flash Arbitrage
-python examples/demo_100ms_arbitrage.py
-
-# Demo 4 & 5: AI Hedge Fund Manager & Hype Oracle
-python examples/demo_autonomous_hedge_fund.py
-### 4. 🌐 Real Web3 Collateral Vault dApp (MetaMask & Phantom)
+## 🌐 Production Web3 Ecosystem App
 
 A production Web3 dApp built with **Vite + React + Wagmi + RainbowKit + Viem**:
 
@@ -185,55 +152,13 @@ A production Web3 dApp built with **Vite + React + Wagmi + RainbowKit + Viem**:
 cd web-app
 npm install
 npm run dev
-# Opens on http://localhost:3000 with real MetaMask / Phantom wallet connection
-```
-
-Features:
-- **Real Injected & Multi-Chain Wallet Connect**: Full support for MetaMask, Phantom, Coinbase Wallet, and WalletConnect.
-- **Robinhood Chain Native**: Configured with Chain ID `4663` (Mainnet) and `46630` (Testnet) with live 100ms telemetry.
-- **Autonomous Vault Control**: Lock tokens/ETH with duration multipliers (up to 2.5x), track real-time NVDA treasury backing, and claim streaming stock dividends directly on-chain.
-
-### 5. ⛓️ On-Chain Smart Contract Compilation & Deployment
-
-Compile and deploy the verified `RobinhoodCollateralVault.sol` contract directly to Robinhood Chain:
-
-```bash
-# Compile Solidity contracts with Solc 0.8.20
-uv run python scripts/compile_contracts.py
-
-# Deploy to Robinhood Chain Mainnet (or Testnet)
-$env:PRIVATE_KEY="your_private_key_here"
-uv run python scripts/deploy_vault.py
+# Opens on http://localhost:3000
 ```
 
 ---
 
-## 💻 CLI Usage
-
-The framework includes a powerful command-line interface:
-
-```bash
-# Check wallet & 100ms block telemetry
-python -m robyn.cli status
-
-# Set up an automated hedging rule
-python -m robyn.cli hedge --meme 0xCASHCAT --stock NVDA --pump 2.5 --percent 30
-
-# Launch a stock-backed meme token
-python -m robyn.cli launch --name "Sherwood Bull" --symbol SBULL --stock NVDA --percent 10
-
-# Scan & execute 100ms flash arbitrage
-python -m robyn.cli arb --pair CASHCAT/ETH
-
-# Send natural language instructions to Robyn-Agent
-python -m robyn.cli prompt "Robyn, check if NVDA is trending and rebalance my vault"
-```
-
-
----
-
-## 📜 License
+## 📜 License & Authors
 
 Distributed under the **Apache 2.0 License**. See [`LICENSE`](LICENSE) for more information.
 
-Developed by **Robyn Hood** for the **Robinhood Chain** ecosystem.
+Developed by **Synxneuos** & the **Robyn OS Team** for the **Robinhood Chain** ecosystem.
