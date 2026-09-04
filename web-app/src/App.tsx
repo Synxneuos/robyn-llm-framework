@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import StatusBar from '../components/StatusBar'
 import FrameworkHero from '../components/FrameworkHero'
+import EcosystemVisualizer from '../components/EcosystemVisualizer'
 import TerminalSection from '../components/TerminalSection'
 import FrameworkArchitecture from '../components/FrameworkArchitecture'
 import CharacterStudio from '../components/CharacterStudio'
@@ -61,7 +62,8 @@ export default function App() {
 
       {/* 3. Main Content Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full space-y-16 flex-1">
-        <FrameworkHero onExplore={() => scrollToSection('pipeline')} />
+        <FrameworkHero onExplore={() => scrollToSection('visualizer')} />
+        <EcosystemVisualizer />
         <TerminalSection />
         <FrameworkArchitecture />
         <CharacterStudio />

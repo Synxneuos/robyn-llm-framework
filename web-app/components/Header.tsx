@@ -31,7 +31,15 @@ export default function Header({ onNavigate }: HeaderProps) {
         </div>
 
         {/* Center: Clean Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 font-mono text-xs text-[#8B949E]">
+        <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-[#8B949E]">
+          <button
+            type="button"
+            onClick={() => onNavigate('visualizer')}
+            className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Visualizer
+          </button>
           <button
             type="button"
             onClick={() => onNavigate('studio')}
