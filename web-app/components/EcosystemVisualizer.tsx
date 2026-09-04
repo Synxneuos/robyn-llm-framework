@@ -24,20 +24,19 @@ interface GraphEdge {
   from: string
   to: string
   label?: string
-  active?: boolean
 }
 
 export default function EcosystemVisualizer() {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  // Canvas Viewport & Node Positions (Draggable)
+  // Default Node Layout arranged for perfect visual balance
   const initialNodes: GraphNode[] = [
     {
       id: 'input',
       title: 'User Intent Ingest',
       category: 'Perception Stream',
-      x: 40,
-      y: 180,
+      x: 30,
+      y: 190,
       status: 'idle',
       icon: '💬',
       badge: 'RPC / TG',
@@ -55,8 +54,8 @@ export default function EcosystemVisualizer() {
       id: 'robyn',
       title: 'Robyn Engine',
       category: 'Autonomous Cognition',
-      x: 320,
-      y: 160,
+      x: 270,
+      y: 180,
       status: 'idle',
       icon: '⚡',
       badge: 'Robyn Core',
@@ -74,7 +73,7 @@ export default function EcosystemVisualizer() {
       id: 'router',
       title: 'Tool Router',
       category: 'Parallel Dispatch',
-      x: 600,
+      x: 510,
       y: 70,
       status: 'idle',
       icon: '❖',
@@ -93,8 +92,8 @@ export default function EcosystemVisualizer() {
       id: 'oracle',
       title: 'Data & Market Oracle',
       category: 'Price Streams',
-      x: 880,
-      y: 40,
+      x: 750,
+      y: 70,
       status: 'idle',
       icon: '📊',
       badge: 'Pyth / Uniswap',
@@ -112,8 +111,8 @@ export default function EcosystemVisualizer() {
       id: 'risk',
       title: 'Risk & LTV Guard',
       category: 'Safety Circuit Breaker',
-      x: 600,
-      y: 330,
+      x: 510,
+      y: 300,
       status: 'idle',
       icon: '🛡️',
       badge: 'Max LTV 70%',
@@ -131,8 +130,8 @@ export default function EcosystemVisualizer() {
       id: 'collateral',
       title: 'Stocks / ETH Collateral',
       category: 'Token Staking Vault',
-      x: 880,
-      y: 250,
+      x: 750,
+      y: 300,
       status: 'idle',
       icon: '🔒',
       badge: 'Stocks / ETH',
@@ -150,7 +149,7 @@ export default function EcosystemVisualizer() {
       id: 'settlement',
       title: 'Orbit Finality',
       category: 'Robinhood Chain',
-      x: 1150,
+      x: 990,
       y: 190,
       status: 'idle',
       icon: '✓',
@@ -180,10 +179,14 @@ export default function EcosystemVisualizer() {
   const [nodes, setNodes] = useState<GraphNode[]>(initialNodes)
   const [selectedNodeId, setSelectedNodeId] = useState<string>('robyn')
   const [isExecuting, setIsExecuting] = useState<boolean>(false)
-  const [activeStep, setActiveStep] = useState<number>(-1)
-  const [photonProgress, setPhotonProgress] = useState<number>(0)
 
-  // Dragging State
+  // Pan & Zoom Engine
+  const [zoom, setZoom] = useState<number>(0.72)
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 20, y: 40 })
+  const [isPanning, setIsPanning] = useState<boolean>(false)
+  const [panStart, setPanStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // Node Dragging State
   const [dragNodeId, setDragNodeId] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
 
@@ -191,44 +194,102 @@ export default function EcosystemVisualizer() {
   const [stakingAmount, setStakingAmount] = useState<number>(5000)
   const [selectedAssetType, setSelectedAssetType] = useState<'Stocks' | 'ETH'>('Stocks')
 
-  // Handle Drag Start
-  const handlePointerDown = (nodeId: string, e: React.PointerEvent) => {
+  // Auto-Fit zoom on mount based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth
+        if (width < 600) {
+          setZoom(0.48)
+          setPan({ x: 10, y: 20 })
+        } else if (width < 900) {
+          setZoom(0.60)
+          setPan({ x: 15, y: 30 })
+        } else {
+          setZoom(0.72)
+          setPan({ x: 20, y: 40 })
+        }
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Zoom controls
+  const handleZoomIn = () => setZoom(prev => Math.min(1.4, prev + 0.12))
+  const handleZoomOut = () => setZoom(prev => Math.max(0.35, prev - 0.12))
+  const handleFitView = () => {
+    if (containerRef.current) {
+      const width = containerRef.current.offsetWidth
+      const optimalZoom = width < 768 ? 0.48 : width < 1100 ? 0.62 : 0.74
+      setZoom(optimalZoom)
+      setPan({ x: 20, y: 40 })
+    }
+  }
+
+  // Wheel zoom / pan
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault()
+    if (e.ctrlKey || e.metaKey) {
+      const zoomDelta = e.deltaY > 0 ? -0.05 : 0.05
+      setZoom(prev => Math.max(0.35, Math.min(1.4, prev + zoomDelta)))
+    } else {
+      setPan(prev => ({
+        x: prev.x - e.deltaX * 0.7,
+        y: prev.y - e.deltaY * 0.7
+      }))
+    }
+  }
+
+  // Canvas Pan Handlers
+  const handleCanvasPointerDown = (e: React.PointerEvent) => {
+    // Only pan if clicking canvas background (not on a node)
+    if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === 'svg') {
+      setIsPanning(true)
+      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
+    }
+  }
+
+  // Drag Node Handler
+  const handleNodePointerDown = (nodeId: string, e: React.PointerEvent) => {
     e.stopPropagation()
     const node = nodes.find(n => n.id === nodeId)
     if (!node || !containerRef.current) return
 
-    const rect = containerRef.current.getBoundingClientRect()
     setDragNodeId(nodeId)
+    // Convert client coordinates to zoomed canvas space
     setDragOffset({
-      x: (e.clientX - rect.left) - node.x,
-      y: (e.clientY - rect.top) - node.y,
+      x: (e.clientX / zoom) - node.x,
+      y: (e.clientY / zoom) - node.y,
     })
     setSelectedNodeId(nodeId)
   }
 
-  // Handle Dragging
+  // Pointer Move (handles both Node Dragging & Canvas Panning)
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragNodeId || !containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const newX = Math.max(10, Math.min(rect.width - 240, (e.clientX - rect.left) - dragOffset.x))
-    const newY = Math.max(10, Math.min(rect.height - 140, (e.clientY - rect.top) - dragOffset.y))
-
-    setNodes(prev => prev.map(n => n.id === dragNodeId ? { ...n, x: newX, y: newY } : n))
+    if (dragNodeId) {
+      const newX = (e.clientX / zoom) - dragOffset.x
+      const newY = (e.clientY / zoom) - dragOffset.y
+      setNodes(prev => prev.map(n => n.id === dragNodeId ? { ...n, x: newX, y: newY } : n))
+    } else if (isPanning) {
+      setPan({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      })
+    }
   }
 
-  // Handle Drag End
+  // Pointer Up
   const handlePointerUp = () => {
     setDragNodeId(null)
+    setIsPanning(false)
   }
 
   // Run Sequential Data Flow with traveling green photons
   const runSequentialFlow = () => {
     if (isExecuting) return
     setIsExecuting(true)
-    setActiveStep(0)
-    setPhotonProgress(0)
-
-    // Reset node states
     setNodes(prev => prev.map(n => ({ ...n, status: 'idle' })))
 
     const steps = [
@@ -243,7 +304,6 @@ export default function EcosystemVisualizer() {
 
     steps.forEach((step, idx) => {
       setTimeout(() => {
-        setActiveStep(idx)
         setSelectedNodeId(step.id)
         setNodes(prev => prev.map(n => {
           if (n.id === step.id) return { ...n, status: 'running' }
@@ -256,19 +316,18 @@ export default function EcosystemVisualizer() {
     setTimeout(() => {
       setNodes(prev => prev.map(n => ({ ...n, status: 'complete' })))
       setIsExecuting(false)
-      setActiveStep(-1)
     }, 3800)
   }
 
-  // Reset node positions
   const resetLayout = () => {
     setNodes(initialNodes)
+    handleFitView()
     setSelectedNodeId('robyn')
   }
 
   // Calculate Cubic Bezier SVG Curve between two nodes
   const getCurvePath = (n1: GraphNode, n2: GraphNode) => {
-    const x1 = n1.x + 210
+    const x1 = n1.x + 200
     const y1 = n1.y + 55
     const x2 = n2.x
     const y2 = n2.y + 55
@@ -292,23 +351,16 @@ export default function EcosystemVisualizer() {
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
               Robyn Engine Living Architecture
               <span className="text-[11px] font-mono font-normal px-2.5 py-0.5 rounded border border-emerald-500/40 bg-emerald-950/40 text-emerald-300">
-                Draggable & Interactive
+                Pan & Zoom Active
               </span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl mt-1.5 leading-relaxed">
-              Drag any node freely on the canvas. Connected glowing cables adapt in real time. Click nodes to inspect their internal memory tensors, parameters, and Stocks / ETH collateral issuance.
+              Drag nodes, pan the canvas, or use Zoom / Fit-to-View controls to inspect all 7 interconnected stages and Stocks / ETH collateral issuance.
             </p>
           </div>
 
           {/* Action Control Buttons */}
-          <div className="flex items-center gap-2.5 self-start lg:self-auto">
-            <button
-              onClick={resetLayout}
-              className="px-3.5 py-2 text-xs font-mono rounded-lg border border-zinc-800 bg-black/60 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all flex items-center gap-1.5"
-            >
-              <span>↺</span> Reset Nodes
-            </button>
-
+          <div className="flex items-center gap-2 self-start lg:self-auto">
             <button
               onClick={runSequentialFlow}
               disabled={isExecuting}
@@ -332,12 +384,14 @@ export default function EcosystemVisualizer() {
 
       {/* 2. MAIN FLOATING NODE CANVAS & INSPECTOR SPLIT */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Left: Drag & Drop Node Canvas (8 Cols on XL) */}
+        {/* Left: Drag, Pan & Zoom Node Canvas */}
         <div
           ref={containerRef}
+          onWheel={handleWheel}
+          onPointerDown={handleCanvasPointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="xl:col-span-8 border border-zinc-800/90 bg-[#04060A] rounded-xl relative overflow-hidden min-h-[580px] h-[620px] cursor-grab active:cursor-grabbing"
+          className="xl:col-span-8 border border-zinc-800/90 bg-[#04060A] rounded-xl relative overflow-hidden min-h-[580px] h-[640px] cursor-grab active:cursor-grabbing"
           style={{ touchAction: 'none' }}
         >
           {/* Subtle Dot Matrix Grid */}
@@ -349,134 +403,175 @@ export default function EcosystemVisualizer() {
             }}
           />
 
-          {/* Floating Instructions Pill */}
-          <div className="absolute top-4 left-4 z-20 pointer-events-none bg-black/80 border border-zinc-800/80 px-3 py-1.5 rounded-lg text-[11px] font-mono text-zinc-400 flex items-center gap-2 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>Click & Drag Nodes • Cables recalculate live</span>
+          {/* Top Floating Controls Overlay */}
+          <div className="absolute top-4 left-4 z-30 flex items-center gap-2">
+            <div className="bg-black/90 border border-zinc-800 px-3 py-1.5 rounded-lg text-[11px] font-mono text-zinc-400 flex items-center gap-2 backdrop-blur-md shadow-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>Drag Nodes • Pan Canvas • Zoom: {Math.round(zoom * 100)}%</span>
+            </div>
           </div>
 
-          {/* SVG Connection Cables Layer with Traveling Photons */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible">
-            <defs>
-              <linearGradient id="cableGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#1E293B" />
-                <stop offset="50%" stopColor="#00C805" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#1E293B" />
-              </linearGradient>
+          {/* Zoom & Fit Action Pills (Top Right of Canvas) */}
+          <div className="absolute top-4 right-4 z-30 flex items-center gap-1 bg-black/90 border border-zinc-800 p-1 rounded-lg backdrop-blur-md shadow-lg">
+            <button
+              onClick={handleZoomIn}
+              title="Zoom In"
+              className="w-7 h-7 flex items-center justify-center rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-sm font-bold transition-colors"
+            >
+              +
+            </button>
+            <button
+              onClick={handleZoomOut}
+              title="Zoom Out"
+              className="w-7 h-7 flex items-center justify-center rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-sm font-bold transition-colors"
+            >
+              −
+            </button>
+            <button
+              onClick={handleFitView}
+              title="Fit to Screen"
+              className="px-2.5 h-7 flex items-center justify-center rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-mono font-semibold transition-colors"
+            >
+              ⛶ Fit All
+            </button>
+            <button
+              onClick={resetLayout}
+              title="Reset Layout"
+              className="px-2.5 h-7 flex items-center justify-center rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-mono transition-colors"
+            >
+              ↺ Reset
+            </button>
+          </div>
 
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="glow" />
-                <feComposite in="SourceGraphic" in2="glow" operator="over" />
-              </filter>
-            </defs>
+          {/* Transformed Canvas World Container */}
+          <div
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transformOrigin: '0 0',
+              width: '1300px',
+              height: '560px',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+          >
+            {/* SVG Connection Cables Layer with Traveling Photons */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible">
+              <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="glow" />
+                  <feComposite in="SourceGraphic" in2="glow" operator="over" />
+                </filter>
+              </defs>
 
-            {edges.map((edge, idx) => {
-              const n1 = nodes.find(n => n.id === edge.from)
-              const n2 = nodes.find(n => n.id === edge.to)
-              if (!n1 || !n2) return null
+              {edges.map((edge, idx) => {
+                const n1 = nodes.find(n => n.id === edge.from)
+                const n2 = nodes.find(n => n.id === edge.to)
+                if (!n1 || !n2) return null
 
-              const pathD = getCurvePath(n1, n2)
-              const isSelectedPath = selectedNodeId === n1.id || selectedNodeId === n2.id
+                const pathD = getCurvePath(n1, n2)
+                const isSelectedPath = selectedNodeId === n1.id || selectedNodeId === n2.id
 
-              return (
-                <g key={idx}>
-                  {/* Background Track Cable */}
-                  <path
-                    d={pathD}
-                    fill="none"
-                    stroke={isSelectedPath ? '#22c55e40' : '#1E293B'}
-                    strokeWidth={isSelectedPath ? '3' : '2'}
-                    strokeDasharray={isSelectedPath ? 'none' : '4, 4'}
-                  />
-
-                  {/* Glowing Laser Pulse when active */}
-                  {(isExecuting || isSelectedPath) && (
+                return (
+                  <g key={idx}>
+                    {/* Background Track Cable */}
                     <path
                       d={pathD}
                       fill="none"
-                      stroke="#00C805"
-                      strokeWidth="2.5"
-                      strokeDasharray="8, 16"
-                      className="animate-laser-fast"
-                      filter="url(#glow)"
-                      opacity="0.85"
+                      stroke={isSelectedPath ? '#22c55e40' : '#1E293B'}
+                      strokeWidth={isSelectedPath ? '3' : '2'}
+                      strokeDasharray={isSelectedPath ? 'none' : '4, 4'}
                     />
-                  )}
-                </g>
-              )
-            })}
-          </svg>
 
-          {/* Draggable Nodes Layer */}
-          {nodes.map((node) => {
-            const isSelected = selectedNodeId === node.id
-            const isDraggingThis = dragNodeId === node.id
+                    {/* Glowing Laser Pulse when active */}
+                    {(isExecuting || isSelectedPath) && (
+                      <path
+                        d={pathD}
+                        fill="none"
+                        stroke="#00C805"
+                        strokeWidth="2.5"
+                        strokeDasharray="8, 16"
+                        className="animate-laser-fast"
+                        filter="url(#glow)"
+                        opacity="0.85"
+                      />
+                    )}
+                  </g>
+                )
+              })}
+            </svg>
 
-            return (
-              <div
-                key={node.id}
-                onPointerDown={(e) => handlePointerDown(node.id, e)}
-                style={{
-                  transform: `translate3d(${node.x}px, ${node.y}px, 0)`,
-                  width: '210px',
-                }}
-                className={`absolute top-0 left-0 z-20 rounded-xl p-4 border transition-shadow duration-150 backdrop-blur-md cursor-grab active:cursor-grabbing ${
-                  isDraggingThis
-                    ? 'border-[#00C805] bg-[#0A101D]/95 shadow-2xl shadow-[#00C805]/40 scale-105 z-30'
-                    : isSelected
-                    ? 'border-[#00C805] bg-[#080D18]/95 shadow-xl shadow-[#00C805]/20 ring-1 ring-[#00C805]/50'
-                    : node.status === 'complete'
-                    ? 'border-emerald-500/40 bg-[#060910]/90 hover:border-zinc-600'
-                    : 'border-zinc-800 bg-[#060910]/85 hover:border-zinc-700'
-                }`}
-              >
-                {/* Node Top Ports & Status */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm">{node.icon}</span>
-                    <span className="text-[10px] font-mono text-zinc-400 font-semibold truncate max-w-[90px]">
-                      {node.category}
+            {/* Draggable Nodes Layer */}
+            {nodes.map((node) => {
+              const isSelected = selectedNodeId === node.id
+              const isDraggingThis = dragNodeId === node.id
+
+              return (
+                <div
+                  key={node.id}
+                  onPointerDown={(e) => handleNodePointerDown(node.id, e)}
+                  style={{
+                    transform: `translate3d(${node.x}px, ${node.y}px, 0)`,
+                    width: '200px',
+                  }}
+                  className={`absolute top-0 left-0 z-20 rounded-xl p-4 border transition-shadow duration-150 backdrop-blur-md cursor-grab active:cursor-grabbing ${
+                    isDraggingThis
+                      ? 'border-[#00C805] bg-[#0A101D]/95 shadow-2xl shadow-[#00C805]/40 scale-105 z-30'
+                      : isSelected
+                      ? 'border-[#00C805] bg-[#080D18]/95 shadow-xl shadow-[#00C805]/20 ring-1 ring-[#00C805]/50'
+                      : node.status === 'complete'
+                      ? 'border-emerald-500/40 bg-[#060910]/90 hover:border-zinc-600'
+                      : 'border-zinc-800 bg-[#060910]/85 hover:border-zinc-700'
+                  }`}
+                >
+                  {/* Node Top Ports & Status */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">{node.icon}</span>
+                      <span className="text-[10px] font-mono text-zinc-400 font-semibold truncate max-w-[85px]">
+                        {node.category}
+                      </span>
+                    </div>
+
+                    <span
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold"
+                      style={{
+                        backgroundColor: `${node.badgeColor}15`,
+                        color: node.badgeColor,
+                        border: `1px solid ${node.badgeColor}35`
+                      }}
+                    >
+                      {node.badge}
                     </span>
                   </div>
 
-                  <span
-                    className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold"
-                    style={{
-                      backgroundColor: `${node.badgeColor}15`,
-                      color: node.badgeColor,
-                      border: `1px solid ${node.badgeColor}35`
-                    }}
-                  >
-                    {node.badge}
-                  </span>
+                  {/* Node Title */}
+                  <div className="text-xs font-bold text-white mb-1 truncate">
+                    {node.title}
+                  </div>
+
+                  <p className="text-[10px] text-zinc-400 line-clamp-2 leading-relaxed">
+                    {node.summary}
+                  </p>
+
+                  {/* Node Status Bar */}
+                  <div className="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[9px] font-mono">
+                    <span className="text-zinc-500">Latency: {node.inspector.latency}</span>
+                    <span className={node.status === 'running' ? 'text-emerald-400 animate-pulse font-bold' : node.status === 'complete' ? 'text-emerald-400' : 'text-zinc-500'}>
+                      {node.status === 'running' ? '● RUNNING' : node.status === 'complete' ? '✓ COMPLETE' : '● READY'}
+                    </span>
+                  </div>
+
+                  {/* Visual Connection Port Dots */}
+                  <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-black border-2 border-zinc-600" />
+                  <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-black border-2 border-[#00C805]" />
                 </div>
-
-                {/* Node Title */}
-                <div className="text-xs font-bold text-white mb-1 truncate">
-                  {node.title}
-                </div>
-
-                <p className="text-[10px] text-zinc-400 line-clamp-2 leading-relaxed">
-                  {node.summary}
-                </p>
-
-                {/* Node Status Bar & Socket Points */}
-                <div className="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[9px] font-mono">
-                  <span className="text-zinc-500">Latency: {node.inspector.latency}</span>
-                  <span className={node.status === 'running' ? 'text-emerald-400 animate-pulse font-bold' : node.status === 'complete' ? 'text-emerald-400' : 'text-zinc-500'}>
-                    {node.status === 'running' ? '● RUNNING' : node.status === 'complete' ? '✓ COMPLETE' : '● READY'}
-                  </span>
-                </div>
-
-                {/* Visual Connection Port Dots */}
-                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-black border-2 border-zinc-600" />
-                <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-black border-2 border-[#00C805]" />
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
-        {/* Right: Real-time Glassmorphism Node Inspector (4 Cols on XL) */}
+        {/* Right: Real-time Glassmorphism Node Inspector */}
         <div className="xl:col-span-4 border border-zinc-800/90 bg-[#06080D] rounded-xl p-5 sm:p-6 space-y-5 flex flex-col justify-between backdrop-blur-xl">
           <div className="space-y-4">
             {/* Inspector Header */}
