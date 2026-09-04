@@ -11,10 +11,42 @@ import ModelSpotlight from '../components/ModelSpotlight'
 import DeveloperSDK from '../components/DeveloperSDK'
 import GitHubCTA from '../components/GitHubCTA'
 import Footer from '../components/Footer'
+import RobynVaultProtocol from '../components/RobynVaultProtocol'
 
 export default function App() {
   const [blockNumber, setBlockNumber] = useState<number | null>(null)
   const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
+  const [currentView, setCurrentView] = useState<'main' | 'vault'>('main')
+
+  // Check URL hash and query params for hidden vault view
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const hash = window.location.hash
+      const params = new URLSearchParams(window.location.search)
+      if (hash === '#vault' || params.get('view') === 'vault' || params.get('vault') === 'true') {
+        setCurrentView('vault')
+      } else {
+        setCurrentView('main')
+      }
+    }
+
+    handleUrlChange()
+    window.addEventListener('hashchange', handleUrlChange)
+    window.addEventListener('popstate', handleUrlChange)
+    return () => {
+      window.removeEventListener('hashchange', handleUrlChange)
+      window.removeEventListener('popstate', handleUrlChange)
+    }
+  }, [])
+
+  const setView = (view: 'main' | 'vault') => {
+    setCurrentView(view)
+    if (view === 'vault') {
+      window.location.hash = '#vault'
+    } else {
+      window.location.hash = ''
+    }
+  }
 
   // Real on-chain telemetry polling from Robinhood RPC
   useEffect(() => {
@@ -50,6 +82,11 @@ export default function App() {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  // If in hidden vault mode, render the RobynVaultProtocol page
+  if (currentView === 'vault') {
+    return <RobynVaultProtocol onBackToMain={() => setView('main')} />
   }
 
   return (
