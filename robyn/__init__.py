@@ -12,6 +12,7 @@ from robyn.modules.equi_launchpad import EquiMemeLaunchpad
 from robyn.modules.flash_arbitrage import FlashArbitrageEngine
 from robyn.modules.portfolio_manager import AIPortfolioManager
 from robyn.modules.hype_oracle import OnChainHypeOracle
+from robyn.modules.hyper_speed_engine import HyperSpeedEngine
 
 __all__ = [
     "RobynAgent",
@@ -20,5 +21,6 @@ __all__ = [
     "EquiMemeLaunchpad",
     "FlashArbitrageEngine",
     "AIPortfolioManager",
-    "OnChainHypeOracle"
+    "OnChainHypeOracle",
+    "HyperSpeedEngine"
 ]
