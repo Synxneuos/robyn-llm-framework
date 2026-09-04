@@ -5,9 +5,11 @@ import HeroBanner from '../components/HeroBanner'
 import DexScreenerTerminal from '../components/DexScreenerTerminal'
 import CollateralCalculator from '../components/CollateralCalculator'
 import VaultDashboard from '../components/VaultDashboard'
+import DocsPage from '../components/DocsPage'
 
 export default function App() {
   const { isConnected, address } = useAccount()
+  const [currentView, setCurrentView] = useState<'app' | 'docs'>('app')
   const [blockNumber, setBlockNumber] = useState<number | null>(null)
   const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
   const [calcAmount, setCalcAmount] = useState<string>('')
@@ -43,10 +45,13 @@ export default function App() {
   }, [])
 
   const handleApplyCalculator = (amount: string, days: number) => {
+    setCurrentView('app')
     setCalcAmount(amount)
     setCalcDuration(days)
-    const el = document.getElementById('vault-actions')
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => {
+      const el = document.getElementById('vault-actions')
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
   }
 
   return (
@@ -71,13 +76,19 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
+            <button
+              onClick={() => setCurrentView('docs')}
+              className="text-green-400 hover:text-green-300 font-bold flex items-center gap-1 underline"
+            >
+              📄 Read Whitepaper & Docs ↗
+            </button>
             <a
               href="https://robinhoodchain.blockscout.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-400 hover:text-green-300 flex items-center gap-1 font-semibold underline"
+              className="text-gray-400 hover:text-green-300 flex items-center gap-1 font-semibold"
             >
-              Blockscout Explorer ↗
+              Explorer ↗
             </a>
           </div>
         </div>
@@ -86,7 +97,10 @@ export default function App() {
       {/* 2. Top Navigation Bar */}
       <header className="border-b border-white/10 backdrop-blur-xl sticky top-0 z-50 bg-[#040608]/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div
+            onClick={() => setCurrentView('app')}
+            className="flex items-center gap-3 cursor-pointer select-none"
+          >
             {/* Robinhood Feather Emblem */}
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center p-2 shadow-lg shadow-green-500/30">
               <svg className="w-full h-full text-black fill-current" viewBox="0 0 24 24">
@@ -99,7 +113,7 @@ export default function App() {
                   Robyn OS <span className="text-green-400 font-extrabold">- FW</span>
                 </h1>
                 <span className="bg-green-500/20 text-green-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-green-500/40 tracking-wider">
-                  OFFICIAL
+                  FIRST ON-CHAIN AI
                 </span>
               </div>
               <p className="text-[11px] text-gray-400 font-medium">
@@ -109,12 +123,41 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-300">
-              <a href="#vault-actions" className="hover:text-green-400 transition">Staking Vault</a>
-              <a href="#dex-terminal" className="hover:text-green-400 transition">$ROBYN DexScreener</a>
-              <a href="#calculator" className="hover:text-green-400 transition">Calculator</a>
-              <a href="#architecture" className="hover:text-green-400 transition">Ecosystem</a>
+            <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-gray-300">
+              <button
+                type="button"
+                onClick={() => setCurrentView('app')}
+                className={`transition ${currentView === 'app' ? 'text-green-400' : 'hover:text-white'}`}
+              >
+                Staking Vault
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentView('app')
+                  setTimeout(() => {
+                    const el = document.getElementById('dex-terminal')
+                    if (el) el.scrollIntoView({ behavior: 'smooth' })
+                  }, 100)
+                }}
+                className="hover:text-green-400 transition"
+              >
+                $ROBYN Terminal
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentView('docs')}
+                className={`transition flex items-center gap-1 px-3 py-1 rounded-lg border ${
+                  currentView === 'docs'
+                    ? 'border-green-400 bg-green-500/15 text-green-400 font-bold'
+                    : 'border-white/10 hover:border-green-500/40 text-gray-300'
+                }`}
+              >
+                <span>Documentation</span>
+                <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.2 rounded">NEW</span>
+              </button>
             </nav>
+
             <ConnectButton
               showBalance={{ smallScreen: false, largeScreen: true }}
               chainStatus="icon"
@@ -126,85 +169,91 @@ export default function App() {
 
       {/* 3. Main Dashboard Body */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-12">
-        {/* Hero Section */}
-        <HeroBanner />
+        {currentView === 'docs' ? (
+          <DocsPage onBackToApp={() => setCurrentView('app')} />
+        ) : (
+          <>
+            {/* Hero Section */}
+            <HeroBanner />
 
-        {/* DexScreener Live Terminal Section */}
-        <section id="dex-terminal">
-          <DexScreenerTerminal />
-        </section>
+            {/* DexScreener Live Terminal Section */}
+            <section id="dex-terminal">
+              <DexScreenerTerminal />
+            </section>
 
-        {/* Collateral & Yield Calculator */}
-        <section id="calculator">
-          <CollateralCalculator onSelectAmount={handleApplyCalculator} />
-        </section>
+            {/* Collateral & Yield Calculator */}
+            <section id="calculator">
+              <CollateralCalculator onSelectAmount={handleApplyCalculator} />
+            </section>
 
-        {/* Live Staking & Dividend Vault */}
-        <section>
-          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-2xl font-black text-white tracking-tight">
-                Robyn Autonomous Collateral Vault
-              </h2>
-              <p className="text-xs text-gray-400">
-                Lock principal to mint weighted shares, secure $NVDA backing, and claim streaming stock dividends
-              </p>
-            </div>
-            {!isConnected && (
-              <span className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 px-3 py-1 rounded-lg">
-                💡 Connect MetaMask or Phantom to execute on-chain
-              </span>
-            )}
-          </div>
-          <VaultDashboard presetAmount={calcAmount} presetDuration={calcDuration} />
-        </section>
-
-        {/* Architecture & 5 Breakthrough Modules Showcase */}
-        <section id="architecture" className="border-t border-white/10 pt-12">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-              Autonomous Agency
-            </span>
-            <h3 className="text-3xl font-black text-white tracking-tight mt-3">
-              The Robyn OS - FW Architectural Engine
-            </h3>
-            <p className="text-gray-400 text-sm mt-2">
-              Engineered natively for Robinhood Chain Arbitrum Orbit with 100ms sub-second latency and zero gas overhead.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
-              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
-                ⚡
+            {/* Live Staking & Dividend Vault */}
+            <section>
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-2xl font-black text-white tracking-tight">
+                    Robyn Autonomous Collateral Vault
+                  </h2>
+                  <p className="text-xs text-gray-400">
+                    Lock principal to mint weighted shares, secure $NVDA backing, and claim streaming stock dividends
+                  </p>
+                </div>
+                {!isConnected && (
+                  <span className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 px-3 py-1 rounded-lg">
+                    💡 Connect MetaMask or Phantom to execute on-chain
+                  </span>
+                )}
               </div>
-              <h4 className="font-extrabold text-white text-base mb-2">HyperSpeed Engine (&lt;100ms)</h4>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                Faster execution than Solana. Leverages direct Arbitrum Nitro WebSocket feeds with pre-compiled bytecode routing for instant sub-second transactions.
-              </p>
-            </div>
+              <VaultDashboard presetAmount={calcAmount} presetDuration={calcDuration} />
+            </section>
 
-            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
-              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
-                🏛️
+            {/* Architecture & 5 Breakthrough Modules Showcase */}
+            <section id="architecture" className="border-t border-white/10 pt-12">
+              <div className="text-center max-w-2xl mx-auto mb-10">
+                <span className="bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  Autonomous Agency
+                </span>
+                <h3 className="text-3xl font-black text-white tracking-tight mt-3">
+                  The Robyn OS - FW Architectural Engine
+                </h3>
+                <p className="text-gray-400 text-sm mt-2">
+                  Engineered natively for Robinhood Chain Arbitrum Orbit with 100ms sub-second latency and zero gas overhead.
+                </p>
               </div>
-              <h4 className="font-extrabold text-white text-base mb-2">TradFi Equity Hedging</h4>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                Autonomously converts degen meme profits into tokenized US equities ($NVDA, $AAPL) held directly in transparent on-chain custody.
-              </p>
-            </div>
 
-            <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
-              <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
-                💎
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                    ⚡
+                  </div>
+                  <h4 className="font-extrabold text-white text-base mb-2">HyperSpeed Engine (&lt;100ms)</h4>
+                  <p className="text-gray-400 text-xs leading-relaxed">
+                    Faster execution than Solana. Leverages direct Arbitrum Nitro WebSocket feeds with pre-compiled bytecode routing for instant sub-second transactions.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                    🏛️
+                  </div>
+                  <h4 className="font-extrabold text-white text-base mb-2">TradFi Equity Hedging</h4>
+                  <p className="text-gray-400 text-xs leading-relaxed">
+                    Autonomously converts degen meme profits into tokenized US equities ($NVDA, $AAPL) held directly in transparent on-chain custody.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-gradient-to-b from-black/80 to-[#050b06] border border-green-500/25 p-6 shadow-lg backdrop-blur-md">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 font-bold mb-4">
+                    💎
+                  </div>
+                  <h4 className="font-extrabold text-white text-base mb-2">CLM Auto-Yield Vault</h4>
+                  <p className="text-gray-400 text-xs leading-relaxed">
+                    Concentrated Liquidity Manager automatically rebalances tick ranges around Robinhood orderbook volume, maximizing fee yields for stakers.
+                  </p>
+                </div>
               </div>
-              <h4 className="font-extrabold text-white text-base mb-2">CLM Auto-Yield Vault</h4>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                Concentrated Liquidity Manager automatically rebalances tick ranges around Robinhood orderbook volume, maximizing fee yields for stakers.
-              </p>
-            </div>
-          </div>
-        </section>
+            </section>
+          </>
+        )}
       </main>
 
       {/* 4. Footer */}
@@ -221,6 +270,12 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6">
+            <button
+              onClick={() => setCurrentView('docs')}
+              className="text-green-400 hover:underline"
+            >
+              Documentation
+            </button>
             <a
               href="https://robinhoodchain.blockscout.com"
               target="_blank"
