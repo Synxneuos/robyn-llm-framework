@@ -6,11 +6,14 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
         {/* Brand Column with Locked Logo */}
         <div className="col-span-2 md:col-span-1 space-y-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded hairline-border bg-black p-0.5 overflow-hidden">
-              <img src="/robyn_logo.png" alt="Robyn Logo" className="w-full h-full object-cover rounded" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl hairline-border bg-[#05070A] p-0.5 overflow-hidden shadow-md shadow-[#00C805]/10 flex items-center justify-center shrink-0">
+              <img src="/robyn_logo.png" alt="Robyn Logo" className="w-full h-full object-cover rounded-lg" />
             </div>
-            <span className="text-white font-semibold text-sm">Robyn OS</span>
+            <div>
+              <span className="text-white font-bold text-base tracking-tight block">Robyn OS</span>
+              <span className="text-[10px] text-[#6E7681]">v1.0.0 · Production</span>
+            </div>
           </div>
           <p className="text-[11px] text-[#6E7681] leading-relaxed">
             Autonomous multi-agent execution framework and runtime for Robinhood Chain (Arbitrum Orbit).
