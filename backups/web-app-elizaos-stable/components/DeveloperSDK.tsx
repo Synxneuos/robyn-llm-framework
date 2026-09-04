@@ -1,9 +1,12 @@
+'use client'
+
 import React, { useState } from 'react'
 
 const SDK_TABS = [
   {
     id: 'ts-bun',
     title: 'TypeScript / Bun',
+    lang: 'typescript',
     code: `import { AgentRuntime, RobinhoodPlugin, UniswapPlugin } from "@robyn-os/core";
 
 // 1. Initialize Multi-Agent Runtime on Robinhood Chain
@@ -17,16 +20,17 @@ const runtime = new AgentRuntime({
     }),
     new UniswapPlugin(),
   ],
-  model: "robynhooood/Robyn-Agent",
+  model: "robynhooood/Robyn-Agent", // 0.5B Hermes Tool LLM
 });
 
-// 2. Start perception loop & autonomous execution
+// 2. Start perception loop & autonomous on-chain execution
 await runtime.initialize();
 await runtime.startAutonomousLoop();`,
   },
   {
     id: 'python',
     title: 'Python SDK',
+    lang: 'python',
     code: `from robyn import RobynAgent
 from robyn.chain import RobinhoodClient
 
@@ -43,8 +47,9 @@ agent = RobynAgent(
 agent.start()`,
   },
   {
-    id: 'solidity',
+    id: 'contracts',
     title: 'Solidity Contracts',
+    lang: 'solidity',
     code: `// SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.20;
 
@@ -63,6 +68,23 @@ contract RobynIntegration {
     }
 }`,
   },
+  {
+    id: 'cli',
+    title: 'CLI (3 Steps)',
+    lang: 'bash',
+    code: `# 1. Install CLI globally via Bun or NPM
+bun i -g @robyn-os/cli     # or: pip install robyn-framework
+
+# 2. Scaffold a new character project
+robyn create my-agent
+
+# 3. Boot agent on Robinhood Chain
+robyn start
+
+# [Robyn Runtime] Connected to Robinhood Chain (Chain ID: 420120, Latency: 100ms)
+# [Robyn Runtime] Loaded Robyn-Agent 0.5B Hermes model
+# [Robyn Runtime] Autonomous agent active. Scanning mempool...`,
+  },
 ]
 
 export default function DeveloperSDK() {
@@ -77,40 +99,43 @@ export default function DeveloperSDK() {
   }
 
   return (
-    <section id="sdk" className="space-y-6 pt-10">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-border-b pb-4">
+    <section id="sdk" className="space-y-6 pt-6">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 font-mono text-[11px] text-[#00C805] uppercase">
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#00C805]">
             <span>// 06_DEVELOPER_SDK</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
             Build on Robyn OS
           </h2>
-          <p className="text-[#8B949E] text-xs sm:text-sm mt-1">
-            Native SDKs in TypeScript, Python, and Solidity for rapid integration on Robinhood Chain.
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">
+            Native SDKs in TypeScript/Bun, Python, and Solidity engineered for rapid integration on Robinhood Chain.
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleCopy}
-          className="font-mono text-xs text-white bg-white/5 hover:bg-white/10 hairline-border px-3 py-1.5 rounded-lg transition self-start sm:self-auto"
+          className="font-mono text-xs text-gray-300 hover:text-white bg-black border border-white/15 px-3 py-1.5 rounded-xl self-start sm:self-auto hover:bg-white/5 transition"
         >
-          {copied ? '✓ Copied' : 'Copy snippet'}
+          {copied ? '✓ Copied Code' : 'Copy Snippet'}
         </button>
       </div>
 
-      <div className="bg-[#05070A] hairline-border rounded-xl overflow-hidden shadow-2xl">
-        <div className="flex bg-[#020406] hairline-border-b font-mono text-xs overflow-x-auto">
+      {/* Code Container */}
+      <div className="rounded-2xl bg-[#030608] border border-[#00C805]/30 overflow-hidden shadow-2xl">
+        {/* Tab Header */}
+        <div className="flex border-b border-white/10 bg-black/80 overflow-x-auto font-mono text-xs">
           {SDK_TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-3 transition whitespace-nowrap ${
+              className={`px-5 py-3 font-bold transition whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-white/10 text-white font-semibold hairline-border-b border-[#00C805]'
-                  : 'text-[#8B949E] hover:text-white'
+                  ? 'bg-white/5 text-[#00C805] border-b-2 border-[#00C805]'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {tab.title}
@@ -118,10 +143,17 @@ export default function DeveloperSDK() {
           ))}
         </div>
 
-        <div className="p-5 font-mono text-xs text-[#C9D1D9] bg-[#030507] overflow-x-auto leading-relaxed">
-          <pre className="whitespace-pre-wrap font-mono">
+        {/* Code View */}
+        <div className="p-5 font-mono text-xs text-emerald-400/95 overflow-x-auto bg-[#010204] leading-relaxed">
+          <pre className="whitespace-pre-wrap">
             <code>{currentTab.code}</code>
           </pre>
+        </div>
+
+        {/* Footer info bar */}
+        <div className="px-5 py-2.5 bg-black/60 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-gray-400">
+          <span>Target Chain: Robinhood Mainnet (Arbitrum Orbit)</span>
+          <span className="text-[#00C805]">Apache-2.0 Open Source</span>
         </div>
       </div>
     </section>

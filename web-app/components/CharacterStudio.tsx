@@ -1,20 +1,18 @@
-'use client'
-
 import React, { useState } from 'react'
 
-interface CharacterPreset {
+interface Preset {
   id: string
   name: string
   role: string
   json: Record<string, any>
-  streamLogs: string[]
+  logs: string[]
 }
 
-const PRESETS: CharacterPreset[] = [
+const PRESETS: Preset[] = [
   {
     id: 'robyn-arb',
-    name: 'Robyn (Flash Arb)',
-    role: 'Autonomous 100ms Arbitrage & Liquidity Optimizer',
+    name: 'robyn-arb.json',
+    role: 'Autonomous Arbitrage Agent',
     json: {
       name: "Robyn-Arb",
       clients: ["robinhood", "telegram"],
@@ -37,20 +35,20 @@ const PRESETS: CharacterPreset[] = [
       ],
       system: "You are Robyn-Arb. Automatically execute flash swaps when profit margin > 0.35% and gas < 2 Gwei."
     },
-    streamLogs: [
+    logs: [
       "[00:00.100] [PERCEPTION] Ingested Block #54,440,747 (Arbitrum Nitro)",
-      "[00:00.180] [EVALUATION] Price imbalance detected on CASHCAT/ETH (0.72% spread)",
-      "[00:00.220] [SIMULATION] Simulating 10.0 ETH flash swap via Robinhood RPC... REVERT_RATE: 0.00%",
-      "[00:00.290] [ACTION] Executed TX: 0x4f8a...c7b2 (Gas: 0.00012 ETH, Net Yield: +0.072 ETH)",
-      "[00:00.350] [ORACLE] Cryptographic state proof anchored to Blockscout."
+      "[00:00.180] [REASONING] Price spread detected on CASHCAT/ETH pair (0.72%)",
+      "[00:00.220] [SIMULATION] Off-chain state transition simulation: STATUS_OK (Gas: 42k)",
+      "[00:00.290] [SETTLEMENT] Dispatched TX 0x4f8a...c7b2 on Robinhood Chain (0.00012 ETH fee)",
+      "[00:00.350] [VERIFICATION] Confirmed on Blockscout. State receipt anchored."
     ]
   },
   {
-    id: 'robyn-rwa',
-    name: 'Robyn (RWA Collateral)',
-    role: 'Real-World Asset Treasury & Tokenized Stock Vault',
+    id: 'robyn-treasury',
+    name: 'robyn-treasury.json',
+    role: 'RWA Collateral Guardian',
     json: {
-      name: "Robyn-Collateral",
+      name: "Robyn-Treasury",
       clients: ["robinhood"],
       modelProvider: "huggingface/robynhooood/Robyn-Agent",
       plugins: [
@@ -62,19 +60,19 @@ const PRESETS: CharacterPreset[] = [
         "Autonomous treasury guardian managing on-chain backing of tokenized equity ($NVDA, $AAPL).",
         "Streams dividends and guarantees over-collateralization ratios."
       ],
-      system: "Verify escrowed equity backing and stream staking yield to verified holders."
+      system: "Verify escrowed equity backing and stream staking yield to stakers pool."
     },
-    streamLogs: [
-      "[00:01.000] [TELEMETRY] Querying Robinhood Chain Collateral Vault Escrow",
+    logs: [
+      "[00:01.000] [PERCEPTION] Querying Collateral Vault Escrow state",
       "[00:01.120] [ORACLE] NVDA Stock Price: $128.40 | Vault Backing Ratio: 142.5%",
-      "[00:01.250] [DIVIDEND] Streaming dividend yield distribution to stakers pool",
+      "[00:01.250] [ACTION] Streaming dividend yield distribution to stakers pool",
       "[00:01.320] [SETTLEMENT] TX 0x9b1c...fa44 verified on Robinhood Blockscout."
     ]
   },
   {
     id: 'robyn-clm',
-    name: 'Robyn (CLM Concentrated Yield)',
-    role: 'Dynamic Uniswap V3 Range Re-centering Daemon',
+    name: 'robyn-clm.json',
+    role: 'Concentrated Liquidity Manager',
     json: {
       name: "Robyn-CLM",
       clients: ["robinhood"],
@@ -88,7 +86,7 @@ const PRESETS: CharacterPreset[] = [
       ],
       system: "Monitor tick volatility. When spot price exits 1.5% delta, burn and re-mint optimal range."
     },
-    streamLogs: [
+    logs: [
       "[00:02.050] [MONITOR] Scanning Uniswap V3 NVDA/USDC tick range...",
       "[00:02.140] [TRIGGER] Spot price at boundary tick 85120. Volatility index: 0.42",
       "[00:02.210] [RECENTER] Re-centering concentrated liquidity around spot +/- 1.25%",
@@ -103,39 +101,38 @@ export default function CharacterStudio() {
 
   const activePreset = PRESETS.find((p) => p.id === selectedId) || PRESETS[0]
 
-  const handleCopyJson = () => {
+  const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(activePreset.json, null, 2))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <section id="character-studio" className="space-y-6 pt-6">
-      {/* Header Info */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
+    <section id="studio" className="space-y-6 pt-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-border-b pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#00C805]">
-            <span>// 02_CHARACTER_ARCHITECTURE</span>
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] text-[#00C805] uppercase">
+            <span>// 03_CHARACTER_STUDIO</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
-            Character Studio & Live Execution Stream
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
+            Agent Studio & Execution Trace
           </h2>
-          <p className="text-gray-400 text-xs sm:text-sm mt-1">
-            Configure declarative agent specifications in JSON, load plugins, and witness sub-100ms real-time execution.
+          <p className="text-[#8B949E] text-xs sm:text-sm mt-1">
+            Declarative character configuration alongside real-time sub-100ms execution telemetry.
           </p>
         </div>
 
-        {/* Preset Selector Buttons */}
-        <div className="flex items-center gap-2 bg-black border border-white/10 p-1.5 rounded-xl font-mono text-xs">
+        {/* Preset Selector */}
+        <div className="flex items-center gap-1 bg-[#05070A] hairline-border p-1 rounded-lg font-mono text-xs">
           {PRESETS.map((preset) => (
             <button
               key={preset.id}
               type="button"
               onClick={() => setSelectedId(preset.id)}
-              className={`px-3 py-1.5 rounded-lg font-bold transition ${
+              className={`px-3 py-1 rounded text-xs transition ${
                 selectedId === preset.id
-                  ? 'bg-[#00C805] text-black shadow-md shadow-[#00C805]/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-white/10 text-white font-semibold'
+                  : 'text-[#8B949E] hover:text-white'
               }`}
             >
               {preset.name}
@@ -144,72 +141,63 @@ export default function CharacterStudio() {
         </div>
       </div>
 
-      {/* Split View: Left = Character.json | Right = Live Terminal Logs */}
+      {/* Split Studio: Left = Config Editor | Right = Live Execution Logs */}
       <div className="grid lg:grid-cols-12 gap-6">
-        {/* Left Side: character.json Editor */}
-        <div className="lg:col-span-6 bg-[#030608] border border-[#00C805]/30 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between px-4 py-3 bg-black/80 border-b border-white/10 font-mono text-xs">
-            <div className="flex items-center gap-2 text-gray-300">
-              <span className="text-[#00C805]">●</span>
-              <span className="font-bold">characters/{String(activePreset.json['name']).toLowerCase()}.character.json</span>
-            </div>
+        {/* Left: JSON Config */}
+        <div className="lg:col-span-6 bg-[#05070A] hairline-border rounded-xl overflow-hidden shadow-2xl flex flex-col justify-between">
+          <div className="px-4 py-3 bg-[#020406] hairline-border-b flex items-center justify-between font-mono text-xs">
+            <span className="text-white font-medium">characters/{activePreset.name}</span>
             <button
               type="button"
-              onClick={handleCopyJson}
-              className="text-gray-400 hover:text-white text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 transition"
+              onClick={handleCopy}
+              className="text-[11px] text-[#8B949E] hover:text-white px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition"
             >
-              {copied ? '✓ Copied JSON' : 'Copy JSON'}
+              {copied ? '✓ Copied' : 'Copy JSON'}
             </button>
           </div>
 
-          <div className="p-4 sm:p-5 font-mono text-xs text-gray-300 overflow-x-auto leading-relaxed bg-[#020406]">
-            <pre className="text-emerald-400/90 whitespace-pre-wrap font-mono">
+          <div className="p-4 sm:p-5 font-mono text-xs text-[#C9D1D9] overflow-x-auto bg-[#030507] leading-relaxed">
+            <pre className="whitespace-pre-wrap font-mono">
               {JSON.stringify(activePreset.json, null, 2)}
             </pre>
           </div>
 
-          <div className="px-4 py-2.5 bg-black/60 border-t border-white/10 font-mono text-[11px] text-gray-400 flex items-center justify-between">
+          <div className="px-4 py-2.5 bg-[#020406] hairline-border-t font-mono text-[11px] text-[#8B949E] flex items-center justify-between">
             <span>Model: Hermes 0.5B Tool LLM</span>
-            <span className="text-[#00C805]">EVM Smart Account: 0x4337...</span>
+            <span className="text-[#00C805]">Account: ERC-4337</span>
           </div>
         </div>
 
-        {/* Right Side: Real-time Execution Stream */}
-        <div className="lg:col-span-6 bg-[#020406] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between px-4 py-3 bg-black/80 border-b border-white/10 font-mono text-xs">
+        {/* Right: Live Execution Trace */}
+        <div className="lg:col-span-6 bg-[#05070A] hairline-border rounded-xl overflow-hidden shadow-2xl flex flex-col justify-between">
+          <div className="px-4 py-3 bg-[#020406] hairline-border-b flex items-center justify-between font-mono text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#00C805] animate-ping" />
-              <span className="font-bold text-white tracking-wider">LIVE_AGENT_EXECUTION_TRACE</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00C805] animate-pulse" />
+              <span className="text-white font-medium">EXECUTION_TRACE_LOG</span>
             </div>
-            <span className="text-[10px] text-[#00C805] font-mono border border-[#00C805]/30 px-2 py-0.5 rounded-full">
-              LATENCY: 100ms
-            </span>
+            <span className="text-[11px] text-[#8B949E]">LATENCY: 100ms NITRO</span>
           </div>
 
-          <div className="p-4 sm:p-5 font-mono text-xs space-y-3 bg-[#010203] text-gray-200 overflow-x-auto min-h-[260px]">
-            {activePreset.streamLogs.map((log, index) => (
-              <div key={index} className="flex items-start gap-2 leading-relaxed">
-                <span className="text-gray-500 select-none">›</span>
-                <span className={index === activePreset.streamLogs.length - 1 ? 'text-[#00C805] font-bold' : 'text-gray-300'}>
+          <div className="p-4 sm:p-5 font-mono text-xs space-y-3 bg-[#030507] text-[#C9D1D9] overflow-x-auto min-h-[260px]">
+            {activePreset.logs.map((log, idx) => (
+              <div key={idx} className="flex items-start gap-2 leading-relaxed">
+                <span className="text-[#6E7681] select-none">›</span>
+                <span className={idx === activePreset.logs.length - 1 ? 'text-[#00C805] font-semibold' : 'text-[#C9D1D9]'}>
                   {log}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="px-4 py-3 bg-black/60 border-t border-white/10 flex items-center justify-between font-mono text-xs">
-            <div className="flex items-center gap-2 text-gray-400">
-              <span className="text-[#00C805]">✓</span>
-              <span>Arbitrum Orbit Sequencer: SYNCED</span>
-            </div>
+          <div className="px-4 py-2.5 bg-[#020406] hairline-border-t font-mono text-[11px] text-[#8B949E] flex items-center justify-between">
+            <span>Sequencer: Robinhood Nitro</span>
             <a
               href="https://robinhoodchain.blockscout.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#00C805] hover:underline flex items-center gap-1"
+              className="text-[#00C805] hover:underline"
             >
-              <span>Blockscout Explorer</span>
-              <span>↗</span>
+              Blockscout Explorer ↗
             </a>
           </div>
         </div>

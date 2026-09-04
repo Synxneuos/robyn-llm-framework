@@ -9,23 +9,24 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        robinhood: {
+        robyn: {
+          bg: '#000000',
+          surface: '#05070A',
+          surface2: '#0B0E14',
+          surface3: '#121722',
+          border: 'rgba(255, 255, 255, 0.08)',
+          borderHover: 'rgba(255, 255, 255, 0.16)',
           green: '#00C805',
           'green-bright': '#00E806',
-          'green-muted': '#00C80520',
-          dark: '#000000',
-          card: '#0D0E11',
-          surface: '#14161A',
-          border: '#23272F',
-        },
-        green: {
-          400: '#00E806',
-          500: '#00C805',
-          600: '#00A304',
+          'green-dim': 'rgba(0, 200, 5, 0.12)',
+          'green-border': 'rgba(0, 200, 5, 0.3)',
+          muted: '#8B949E',
+          mutedLight: '#C9D1D9',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Geist Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
       },
     },
   },

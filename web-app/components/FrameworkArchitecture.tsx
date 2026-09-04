@@ -1,126 +1,88 @@
-'use client'
-
 import React from 'react'
 
+const PIPELINE_STEPS = [
+  {
+    step: '01',
+    name: 'PERCEPTION',
+    title: 'Mempool & Event Ingestion',
+    desc: 'High-frequency WebSocket listener ingesting Robinhood Orbit Nitro blocks at 100ms intervals.',
+    detail: 'RPC stream: rpc.mainnet.chain.robinhood.com',
+  },
+  {
+    step: '02',
+    name: 'REASONING',
+    title: 'Robyn Neural LLM Core',
+    desc: '0.5B Hermes fine-tuned model decomposes multi-step natural language into structured tool calls.',
+    detail: '<tool_call> JSON schema validation',
+  },
+  {
+    step: '03',
+    name: 'TOOL EXECUTION',
+    title: 'Plugin Resolution Layer',
+    desc: 'Dispatches actions to modular plugins: Uniswap V3, Robinhood RPC, ERC-4337 Smart Accounts.',
+    detail: 'Plugin bus: @robyn-os/plugin-*',
+  },
+  {
+    step: '04',
+    name: 'SIMULATION',
+    title: 'Zero-Revert Pre-Flight',
+    desc: 'Simulates state transitions off-chain to guarantee gas efficiency and 100% execution success.',
+    detail: 'eth_call state verification',
+  },
+  {
+    step: '05',
+    name: 'SETTLEMENT',
+    title: 'Arbitrum Orbit Finality',
+    desc: 'Broadcasts signed transactions to Robinhood Chain with sub-second block inclusion and cryptographic receipts.',
+    detail: 'Blockscout on-chain verification',
+  },
+]
+
 export default function FrameworkArchitecture() {
-  const PIPELINE_STEPS = [
-    {
-      step: '01 // PERCEPTION',
-      title: 'Orbit Ingestion & Signal Loop',
-      desc: 'High-frequency WebSocket stream listening directly to Robinhood Nitro mempool at 100ms intervals.',
-      tag: 'NITRO STREAM',
-      code: 'stream.on("block", (b) => ingest(b.transactions))',
-    },
-    {
-      step: '02 // REASONING',
-      title: 'Robyn Neural 0.5B Tool Calling',
-      desc: 'Fine-tuned Hermes LLM decomposes multi-step directives into deterministic EVM tool calls.',
-      tag: 'TOOL CALLING',
-      code: '<tool_call> {"name": "arb_swap", "params": {...}}',
-    },
-    {
-      step: '03 // SIMULATION',
-      title: 'Zero-Revert Pre-Flight Engine',
-      desc: 'Simulates state transitions off-chain to guarantee gas efficiency and 100% execution success.',
-      tag: 'EVM SIMULATOR',
-      code: 'eth_call(tx) => status: SUCCESS, gasUsed: 42000',
-    },
-    {
-      step: '04 // SETTLEMENT',
-      title: 'Arbitrum Nitro Atomic Execution',
-      desc: 'Broadcasts signed bundle to Robinhood Chain with sub-100ms inclusion and cryptographic receipt.',
-      tag: 'ON-CHAIN SETTLE',
-      code: 'tx_hash: 0x4f8a...c7b2 [Block #54,440,747]',
-    },
-  ]
-
-  const TECH_SPECS = [
-    {
-      title: '100ms Block Latency',
-      val: '100ms',
-      desc: 'Ultra-low latency Arbitrum Orbit Nitro L2 rollup finality.',
-      icon: '⚡',
-    },
-    {
-      title: 'Robyn-Neural LLM',
-      val: '0.5B Params',
-      desc: 'Ultra-lightweight on-device tool calling model on Hugging Face.',
-      icon: '🧠',
-    },
-    {
-      title: 'Sub-Cent Gas Fees',
-      val: '~0.36 Gwei',
-      desc: 'Continuous autonomous agent swarms without treasury depletion.',
-      icon: '⛽',
-    },
-    {
-      title: 'Universal EVM',
-      val: 'Orbit Nitro',
-      desc: 'Zero friction compatibility with all ERC-20, AMM, and RWA contracts.',
-      icon: '🌐',
-    },
-  ]
-
   return (
-    <section id="architecture" className="space-y-10 pt-6">
+    <section id="pipeline" className="space-y-8 pt-10">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-border-b pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#00C805]">
-            <span>// 04_RUNTIME_PIPELINE</span>
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] text-[#00C805] uppercase">
+            <span>// 02_ENGINEERING_ARCHITECTURE</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
-            4-Stage Autonomous Pipeline
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
+            THE RUNTIME
           </h2>
-          <p className="text-gray-400 text-xs sm:text-sm mt-1">
-            How Robyn OS transitions from natural language intent to sub-100ms atomic on-chain settlement.
+          <p className="text-[#8B949E] text-xs sm:text-sm mt-1">
+            A modular execution layer engineered for autonomous agents on Arbitrum Orbit.
           </p>
         </div>
 
-        <div className="font-mono text-xs text-gray-400 bg-black/60 border border-white/10 px-3 py-1.5 rounded-xl self-start sm:self-auto">
-          LATENCY TARGET: <span className="text-[#00C805] font-bold">&lt;100ms</span>
+        <div className="font-mono text-xs text-[#8B949E]">
+          5-STAGE DETERMINISTIC PIPELINE
         </div>
       </div>
 
-      {/* 4-Step Pipeline Cards */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {PIPELINE_STEPS.map((item, index) => (
+      {/* Engineering Pipeline Flow (Open Layout with Connectors) */}
+      <div className="grid md:grid-cols-5 gap-4">
+        {PIPELINE_STEPS.map((step, idx) => (
           <div
-            key={index}
-            className="rounded-2xl bg-[#030608] border border-white/10 hover:border-[#00C805]/40 p-5 flex flex-col justify-between transition-all duration-300 shadow-xl relative group"
+            key={step.step}
+            className="bg-[#05070A] hairline-border rounded-xl p-5 flex flex-col justify-between hover:border-white/20 transition group"
           >
             <div>
-              <div className="flex items-center justify-between mb-3 font-mono">
-                <span className="text-xs font-bold text-[#00C805]">{item.step}</span>
-                <span className="text-[9px] font-bold text-gray-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
-                  {item.tag}
-                </span>
+              <div className="flex items-center justify-between font-mono text-xs text-[#8B949E] mb-3">
+                <span className="text-white font-bold">{step.step}</span>
+                <span className="text-[10px] text-[#00C805]">{step.name}</span>
               </div>
-              <h3 className="font-mono font-bold text-white text-sm sm:text-base mb-2 group-hover:text-[#00C805] transition">
-                {item.title}
+              <h3 className="font-mono text-sm font-semibold text-white mb-2 group-hover:text-[#00C805] transition">
+                {step.title}
               </h3>
-              <p className="text-gray-400 text-xs leading-relaxed mb-4">{item.desc}</p>
+              <p className="text-[#8B949E] text-xs leading-relaxed mb-4">
+                {step.desc}
+              </p>
             </div>
-            <div className="bg-black/90 border border-white/10 rounded-lg p-2.5 font-mono text-[11px] text-[#4EFA66] overflow-x-auto">
-              <code>{item.code}</code>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      {/* 4 Tech Specs Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-        {TECH_SPECS.map((spec, index) => (
-          <div
-            key={index}
-            className="bg-[#020406] border border-white/10 rounded-2xl p-5 hover:border-[#00C805]/30 transition"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xl">{spec.icon}</span>
-              <span className="font-mono text-sm font-extrabold text-[#00C805]">{spec.val}</span>
+            <div className="pt-3 hairline-border-t border-white/5 font-mono text-[10px] text-[#6E7681]">
+              {step.detail}
             </div>
-            <div className="font-mono text-xs font-bold text-white mt-1">{spec.title}</div>
-            <div className="text-[11px] text-gray-400 mt-1 leading-relaxed">{spec.desc}</div>
           </div>
         ))}
       </div>

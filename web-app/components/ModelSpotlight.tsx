@@ -1,75 +1,67 @@
-'use client'
-
 import React from 'react'
 
 export default function ModelSpotlight() {
   return (
-    <section id="model" className="rounded-3xl bg-[#030608] border border-[#00C805]/30 p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-[#00C805]/10 rounded-full blur-[100px] pointer-events-none" />
-
-      <div className="grid lg:grid-cols-12 gap-8 items-center">
-        {/* Left Column: Model Specs & Value Prop */}
-        <div className="lg:col-span-7 space-y-5">
-          <div className="inline-flex items-center gap-2 bg-black border border-[#00C805]/40 rounded-full px-3 py-1 font-mono text-[11px] text-[#00C805] uppercase tracking-wider">
+    <section id="models" className="space-y-6 pt-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 hairline-border-b pb-4">
+        <div>
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] text-[#00C805] uppercase">
             <span>// 05_NEURAL_CORE</span>
-            <span>·</span>
-            <span>HUGGING FACE MODEL</span>
           </div>
-
-          <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Robyn-Agent: 0.5B Financial Neural Engine
-          </h3>
-
-          <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
-            Fine-tuned specifically for autonomous EVM tool calling and financial reasoning. Uses the structured <strong className="text-white">Hermes &lt;tool_call&gt; JSON format</strong> to parse natural language instructions into validated on-chain transactions in under 20 milliseconds on local hardware.
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
+            Robyn-Agent Model
+          </h2>
+          <p className="text-[#8B949E] text-xs sm:text-sm mt-1">
+            0.5B parameter lightweight neural engine fine-tuned for deterministic EVM tool calling and financial reasoning.
           </p>
-
-          <div className="grid sm:grid-cols-3 gap-3 pt-2 font-mono">
-            <div className="p-3.5 bg-black/80 rounded-xl border border-white/10">
-              <span className="text-[10px] text-gray-500 font-bold uppercase block">Parameters</span>
-              <span className="text-base sm:text-lg font-black text-white">0.5 Billion</span>
-              <span className="text-[10px] text-gray-400 block mt-0.5">Ultra-fast local</span>
-            </div>
-
-            <div className="p-3.5 bg-black/80 rounded-xl border border-white/10">
-              <span className="text-[10px] text-gray-500 font-bold uppercase block">Tool Syntax</span>
-              <span className="text-base sm:text-lg font-black text-[#00C805]">Hermes JSON</span>
-              <span className="text-[10px] text-gray-400 block mt-0.5">Structured tool schema</span>
-            </div>
-
-            <div className="p-3.5 bg-black/80 rounded-xl border border-white/10">
-              <span className="text-[10px] text-gray-500 font-bold uppercase block">Inference Speed</span>
-              <span className="text-base sm:text-lg font-black text-white">&lt; 20ms</span>
-              <span className="text-[10px] text-gray-400 block mt-0.5">Sub-second ready</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <a
-              href="https://huggingface.co/robynhooood/Robyn-Agent"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#00C805] hover:bg-[#00E806] text-black font-black px-6 py-3 rounded-xl text-xs transition flex items-center gap-2 shadow-lg shadow-[#00C805]/20 font-mono"
-            >
-              <span>Download Weights on Hugging Face</span>
-              <span>↗</span>
-            </a>
-            <span className="text-xs text-gray-400 font-mono">
-              ID: <strong className="text-white">robynhooood/Robyn-Agent</strong>
-            </span>
-          </div>
         </div>
 
-        {/* Right Column: Code Format Sample */}
-        <div className="lg:col-span-5">
-          <div className="rounded-2xl bg-black border border-white/15 p-5 font-mono text-xs shadow-xl space-y-2">
-            <div className="flex items-center justify-between pb-2.5 border-b border-white/10 text-[11px] text-gray-400">
-              <span>Hermes Tool-Calling Output</span>
-              <span className="text-[#00C805]">JSON SCHEMA</span>
+        <a
+          href="https://huggingface.co/robynhooood/Robyn-Agent"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-xs text-white bg-white/5 hover:bg-white/10 hairline-border px-3 py-1.5 rounded-lg transition self-start sm:self-auto flex items-center gap-1.5"
+        >
+          <span>Download on Hugging Face</span>
+          <span className="text-[#8B949E]">↗</span>
+        </a>
+      </div>
+
+      <div className="grid lg:grid-cols-12 gap-6 items-center">
+        {/* Specs Table */}
+        <div className="lg:col-span-6 bg-[#05070A] hairline-border rounded-xl p-5 sm:p-6 space-y-4">
+          <div className="font-mono text-xs text-[#8B949E] uppercase">TECHNICAL SPECIFICATIONS</div>
+          <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+            <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
+              <span className="text-[#6E7681] text-[10px] block">PARAMETER SIZE</span>
+              <span className="text-white font-bold text-sm mt-0.5 block">0.5 Billion</span>
             </div>
-            <pre className="text-gray-300 text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap">
-              <code>{`<tool_call>
+            <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
+              <span className="text-[#6E7681] text-[10px] block">TOOL FORMAT</span>
+              <span className="text-[#00C805] font-bold text-sm mt-0.5 block">Hermes JSON</span>
+            </div>
+            <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
+              <span className="text-[#6E7681] text-[10px] block">INFERENCE SPEED</span>
+              <span className="text-white font-bold text-sm mt-0.5 block">&lt; 20ms Local</span>
+            </div>
+            <div className="bg-[#020406] p-3.5 rounded-lg hairline-border">
+              <span className="text-[#6E7681] text-[10px] block">CONTEXT WINDOW</span>
+              <span className="text-white font-bold text-sm mt-0.5 block">8,192 Tokens</span>
+            </div>
+          </div>
+          <p className="text-xs text-[#8B949E] leading-relaxed">
+            Optimized for sub-second on-device inference via GGUF, Ollama, and vLLM. Parses multi-step user prompts into validated on-chain calldata with zero execution reverts.
+          </p>
+        </div>
+
+        {/* Schema Preview */}
+        <div className="lg:col-span-6 bg-[#05070A] hairline-border rounded-xl p-5 sm:p-6 font-mono text-xs space-y-2">
+          <div className="flex items-center justify-between pb-2 hairline-border-b font-mono text-[11px] text-[#8B949E]">
+            <span>HERMES_TOOL_SCHEMA</span>
+            <span className="text-[#00C805]">DETERMINISTIC</span>
+          </div>
+          <pre className="text-[#C9D1D9] text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap bg-[#020406] p-4 rounded-lg hairline-border">
+            <code>{`<tool_call>
 {
   "name": "execute_clm_rebalance",
   "arguments": {
@@ -80,8 +72,7 @@ export default function ModelSpotlight() {
   }
 }
 </tool_call>`}</code>
-            </pre>
-          </div>
+          </pre>
         </div>
       </div>
     </section>

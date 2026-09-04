@@ -1,33 +1,47 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 5, 8, 20;
-  --background-end-rgb: 10, 18, 40;
+@layer base {
+  body {
+    background-color: #000000;
+    color: #E2E8F0;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    135deg,
-    rgb(var(--background-start-rgb)) 0%,
-    rgb(var(--background-end-rgb)) 100%
-  );
-  min-height: 100vh;
-}
-
-.glow-green {
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-}
-
-.glow-border {
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.card-bg {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+/* Subtle hairline borders and restrained dark surfaces */
+.hairline-border {
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-border-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-border-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Restrained ambient background grid */
+.tech-grid-bg {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 150ms;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
