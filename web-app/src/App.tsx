@@ -13,13 +13,14 @@ import GitHubCTA from '../components/GitHubCTA'
 import Footer from '../components/Footer'
 import RobynVaultProtocol from '../components/RobynVaultProtocol'
 import RobynRoadmapProtocol from '../components/RobynRoadmapProtocol'
+import RobinhoodStockDcaVault from '../components/RobinhoodStockDcaVault'
 
 export default function App() {
   const [blockNumber, setBlockNumber] = useState<number | null>(null)
   const [gasPriceGwei, setGasPriceGwei] = useState<string>('0.36')
-  const [currentView, setCurrentView] = useState<'main' | 'vault' | 'roadmap'>('main')
+  const [currentView, setCurrentView] = useState<'main' | 'vault' | 'roadmap' | 'stocks'>('main')
 
-  // Check URL hash and query params for hidden vault or roadmap views
+  // Check URL hash and query params for hidden vault, roadmap, or stocks views
   useEffect(() => {
     const handleUrlChange = () => {
       const hash = window.location.hash
@@ -28,6 +29,8 @@ export default function App() {
         setCurrentView('vault')
       } else if (hash === '#roadmap' || params.get('view') === 'roadmap' || params.get('roadmap') === 'true') {
         setCurrentView('roadmap')
+      } else if (hash === '#stocks' || params.get('view') === 'stocks' || params.get('stocks') === 'true') {
+        setCurrentView('stocks')
       } else {
         setCurrentView('main')
       }
@@ -42,12 +45,14 @@ export default function App() {
     }
   }, [])
 
-  const setView = (view: 'main' | 'vault' | 'roadmap') => {
+  const setView = (view: 'main' | 'vault' | 'roadmap' | 'stocks') => {
     setCurrentView(view)
     if (view === 'vault') {
       window.location.hash = '#vault'
     } else if (view === 'roadmap') {
       window.location.hash = '#roadmap'
+    } else if (view === 'stocks') {
+      window.location.hash = '#stocks'
     } else {
       window.location.hash = ''
     }
@@ -97,6 +102,11 @@ export default function App() {
   // If in hidden roadmap mode, render the RobynRoadmapProtocol page
   if (currentView === 'roadmap') {
     return <RobynRoadmapProtocol onBackToMain={() => setView('main')} />
+  }
+
+  // If in 5-min Stock DCA mode, render the RobinhoodStockDcaVault page
+  if (currentView === 'stocks') {
+    return <RobinhoodStockDcaVault onBackToMain={() => setView('main')} />
   }
 
   return (

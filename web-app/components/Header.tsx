@@ -32,6 +32,13 @@ export default function Header({ onNavigate }: HeaderProps) {
 
         {/* Center: Clean Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-[#8B949E]">
+          <a
+            href="#stocks"
+            className="text-[#00C805] hover:text-[#00e606] transition flex items-center gap-1.5 font-bold px-2 py-1 rounded bg-[#00C805]/10 border border-[#00C805]/20 shadow-[0_0_10px_rgba(0,200,5,0.15)]"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00C805] animate-ping" />
+            5m Stock DCA
+          </a>
           <button
             type="button"
             onClick={() => onNavigate('visualizer')}

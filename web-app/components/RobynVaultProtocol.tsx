@@ -173,6 +173,13 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
           >
             <span>🔐</span> Live Vault Interface (Testnet/Sim)
           </button>
+          <a
+            href="#stocks"
+            className="px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-400/40 text-emerald-300 hover:text-white hover:border-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] ml-auto"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>📈</span> 5-Min Stock DCA Engine ↗
+          </a>
         </div>
 
         {/* TAB 1: INTERACTIVE YIELD & VOLUME CALCULATOR */}
