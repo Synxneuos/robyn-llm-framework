@@ -8,7 +8,7 @@ export interface StockAsset {
   priceUsd: number
   change24h: number
   ca: string
-  chain: 'Arbitrum One' | 'Ethereum'
+  chain: 'Robinhood Chain' | 'Arbitrum One'
   explorerUrl: string
   issuer: string
   holdingUnits: number
@@ -17,67 +17,67 @@ export interface StockAsset {
   badgeColor: string
 }
 
-// Real verified on-chain tokenized stocks traded on Robinhood & EVM
+// Verified Canonical Stock Tokens deployed on Robinhood Chain (ID 4663) & Arbitrum
 export const REAL_TOKENIZED_STOCKS: StockAsset[] = [
   {
-    symbol: 'NVDA.d',
-    name: 'NVIDIA Corporation',
+    symbol: 'NVDA',
+    name: 'NVIDIA • Robinhood Token',
     robinhoodTicker: 'NVDA',
     priceUsd: 120.50,
     change24h: 3.42,
-    ca: '0x4dafffddea93ddf1e0e7b61e844331455053ce5c',
-    chain: 'Arbitrum One',
-    explorerUrl: 'https://arbiscan.io/token/0x4dafffddea93ddf1e0e7b61e844331455053ce5c',
-    issuer: 'Dinari (SEC Reg. Transfer Agent)',
+    ca: '0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec',
+    chain: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com/token/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec',
+    issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
     holdingUnits: 248.65,
     totalValueUsd: 29962.32,
-    targetAllocPct: 40,
+    targetAllocPct: 35,
     badgeColor: 'emerald',
   },
   {
-    symbol: 'bNVDA',
-    name: 'Backed NVIDIA Token',
-    robinhoodTicker: 'NVDA',
-    priceUsd: 120.45,
-    change24h: 3.38,
-    ca: '0xA34C5e0AbE843E10461E2C9586Ea03E55Dbcc495',
-    chain: 'Arbitrum One',
-    explorerUrl: 'https://arbiscan.io/token/0xA34C5e0AbE843E10461E2C9586Ea03E55Dbcc495',
-    issuer: 'Backed Finance (Swiss Compliant RWA)',
-    holdingUnits: 112.40,
-    totalValueUsd: 13538.58,
-    targetAllocPct: 20,
-    badgeColor: 'green',
-  },
-  {
-    symbol: 'AAPL.d',
-    name: 'Apple Inc.',
+    symbol: 'AAPL',
+    name: 'Apple • Robinhood Token',
     robinhoodTicker: 'AAPL',
     priceUsd: 228.30,
     change24h: 1.15,
-    ca: '0x264936d817441113540c576595d2c2069e8b6559',
-    chain: 'Arbitrum One',
-    explorerUrl: 'https://arbiscan.io/token/0x264936d817441113540c576595d2c2069e8b6559',
-    issuer: 'Dinari (1:1 Reg S Custody)',
+    ca: '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9',
+    chain: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com/token/0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9',
+    issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
     holdingUnits: 154.20,
     totalValueUsd: 35203.86,
-    targetAllocPct: 20,
+    targetAllocPct: 25,
     badgeColor: 'blue',
   },
   {
-    symbol: 'SPY.d',
-    name: 'SPDR S&P 500 ETF Trust',
-    robinhoodTicker: 'SPY',
-    priceUsd: 550.20,
-    change24h: 0.84,
-    ca: '0xF4BD09B048248876E39Fcf2e0CDF1aee1240a9D2',
-    chain: 'Arbitrum One',
-    explorerUrl: 'https://arbiscan.io/token/0xF4BD09B048248876E39Fcf2e0CDF1aee1240a9D2',
-    issuer: 'Dinari (Index Equity dShare)',
-    holdingUnits: 88.50,
-    totalValueUsd: 48692.70,
+    symbol: 'TSLA',
+    name: 'Tesla • Robinhood Token',
+    robinhoodTicker: 'TSLA',
+    priceUsd: 218.40,
+    change24h: 2.76,
+    ca: '0x322F0929c4625eD5bAd873c95208D54E1c003b2d',
+    chain: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com/token/0x322F0929c4625eD5bAd873c95208D54E1c003b2d',
+    issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
+    holdingUnits: 118.50,
+    totalValueUsd: 25880.40,
     targetAllocPct: 20,
-    badgeColor: 'purple',
+    badgeColor: 'rose',
+  },
+  {
+    symbol: 'AMZN',
+    name: 'Amazon • Robinhood Token',
+    robinhoodTicker: 'AMZN',
+    priceUsd: 178.90,
+    change24h: 0.94,
+    ca: '0x12f190a9F9d7D37a250758b26824B97CE941bF54',
+    chain: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com/token/0x12f190a9F9d7D37a250758b26824B97CE941bF54',
+    issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
+    holdingUnits: 98.40,
+    totalValueUsd: 17603.76,
+    targetAllocPct: 20,
+    badgeColor: 'amber',
   },
 ]
 
