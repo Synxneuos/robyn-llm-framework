@@ -169,8 +169,20 @@ agent.start()
 
 ---
 
+## 🧩 Modular Plugin Ecosystem (`robyn-plugins`)
+
+Explore the official multi-chain plugin repository: [**Synxneuos/robyn-plugins**](https://github.com/Synxneuos/robyn-plugins)
+
+* 🟢 **`@robyn-os/plugin-solana`**: Jupiter DEX V6 Swap Aggregator & Pump.fun Bonding Curve Sniper
+* 🟢 **`@robyn-os/plugin-env-vault`**: AES-256-GCM Secure KeyVault & Multi-Chain RPC Health Monitor
+* 🟢 **`@robyn-os/plugin-ai-agent`**: Risk Sentinel Guardrails (anti-drainer/slippage) & NLP Social Sentiment Scanner
+* 🟢 **`@robyn-os/plugin-omnichannel`**: Live Telegram Bot Daemon, Discord & WhatsApp Webhooks
+
+---
+
 ## 👥 Contributors & Maintainers
 
 * Lead Developer: **Synxneuos** ([@Synxneuos](https://github.com/Synxneuos))
-* Repository: [https://github.com/robynhood-fw/robyn-llm-framework](https://github.com/robynhood-fw/robyn-llm-framework)
+* Framework Core: [https://github.com/Synxneuos/robyn-llm-framework](https://github.com/Synxneuos/robyn-llm-framework)
+* Plugin Ecosystem: [https://github.com/Synxneuos/robyn-plugins](https://github.com/Synxneuos/robyn-plugins)
 * License: **Apache-2.0**
