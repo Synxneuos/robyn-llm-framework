@@ -12,6 +12,8 @@ BLOCK_TIME_MS = 100  # Sub-100ms Orbit block time
 ROBYN_PRIVATE_KEY = os.getenv("ROBYN_PRIVATE_KEY", "")
 HF_TOKEN = os.getenv("HF_TOKEN", "")
 ROBYN_MODEL_ID = os.getenv("ROBYN_MODEL_ID", "robynhooood/Robyn-Agent")
+# dev wallet - 0xb98eeC8E292090489eC27C0271A4eCF541c9e6aC
+DEV_WALLET = os.getenv("ROBYN_DEV_WALLET", "0xb98eeC8E292090489eC27C0271A4eCF541c9e6aC")
 
 # Well-known Tokenized Stocks (Robinhood Chain RWAs)
 KNOWN_RWAS = {
