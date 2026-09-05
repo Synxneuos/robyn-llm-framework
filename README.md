@@ -180,9 +180,20 @@ Explore the official multi-chain plugin repository: [**Synxneuos/robyn-plugins**
 
 ---
 
+## 📱 Mobile Trading App (`robyn-mobile-app`)
+
+Explore the official ultra-fast Android & iOS mobile trading terminal: [**Synxneuos/robyn-mobile-app**](https://github.com/Synxneuos/robyn-mobile-app)
+
+* 👑 **Pump.fun Style Mobile UI**: King of the Hill (KOTH) hero feed & live bonding curve graduation tracker.
+* ⚡ **1-Tap Fast-Sign Execution**: Local session keys enabling sub-100ms Arbitrum Nitro swaps without wallet popups.
+* 📊 **Live Candlestick Charts**: Mobile TradingView charts, real-time whale orderbook streams & token launchpad.
+
+---
+
 ## 👥 Contributors & Maintainers
 
 * Lead Developer: **Synxneuos** ([@Synxneuos](https://github.com/Synxneuos))
 * Framework Core: [https://github.com/Synxneuos/robyn-llm-framework](https://github.com/Synxneuos/robyn-llm-framework)
 * Plugin Ecosystem: [https://github.com/Synxneuos/robyn-plugins](https://github.com/Synxneuos/robyn-plugins)
+* Mobile Trading App: [https://github.com/Synxneuos/robyn-mobile-app](https://github.com/Synxneuos/robyn-mobile-app)
 * License: **Apache-2.0**
