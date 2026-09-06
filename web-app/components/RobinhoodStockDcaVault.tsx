@@ -111,22 +111,44 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
     lastPing: '...'
   })
 
-  // Simulated Sync Effect to prove CA integration
+  // Real Sync Effect to fetch Live Blockchain Data
   useEffect(() => {
-    const syncInterval = setInterval(() => {
-      // Simulate live network extraction of pending ETH fees
-      const randEth = (Math.random() * 0.03 + 0.12).toFixed(4);
-      // 90% routing calc: ETH * price * 90%
-      const asUsdc = (parseFloat(randEth) * 2600 * 0.9).toFixed(2);
-      setCaData({
-        pendingEth: randEth,
-        claimableUsdc: asUsdc,
-        network: 'Verified via L2',
-        lastPing: new Date().toLocaleTimeString()
-      })
-      setCaSynced(true)
-    }, 4500)
-    return () => clearInterval(syncInterval)
+    const fetchRealData = async () => {
+      try {
+        // Checking Base & ETH Mainnet public RPCs to get the real balance of the CA
+        const rpcs = ['https://mainnet.base.org', 'https://cloudflare-eth.com'];
+        for (const rpc of rpcs) {
+          const res = await fetch(rpc, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getBalance', params: [TEST_CA, 'latest'], id: 1 })
+          });
+          const data = await res.json();
+          if (data && data.result !== undefined) {
+            const eth = parseInt(data.result, 16) / 1e18;
+            if (eth > 0 || rpc === rpcs[rpcs.length - 1]) {
+              const asUsdc = (eth * 2600 * 0.9).toFixed(2);
+              const netName = rpc.includes('base') ? 'Base (Live)' : 'Ethereum (Live)';
+              setCaData({
+                pendingEth: eth.toFixed(6),
+                claimableUsdc: asUsdc,
+                network: netName,
+                lastPing: new Date().toLocaleTimeString()
+              });
+              setCaSynced(true);
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Live sync error:", err);
+      }
+    };
+
+    // Initial fetch and then every 10 seconds
+    fetchRealData();
+    const syncInterval = setInterval(fetchRealData, 10000);
+    return () => clearInterval(syncInterval);
   }, [])
 
   // Execution History Tape
