@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { ethers } from 'ethers'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 export interface StockAsset {
   symbol: string
@@ -101,11 +102,7 @@ const TOKEN_CA = '0x78b96280c3347e0f58a7147b73eb0ec5ffff025d' // $RSTR Token
 const FEE_ESCROW = '0xbc39B6502E1a6Ab36E4A5c5026A35F08342A0A9c' // PonsV2FeeEscrow
 
 export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain: () => void }) {
-  // Real Web3 Wallet State (MetaMask & Phantom)
-  const [walletAccount, setWalletAccount] = useState<string | null>(null)
-  const [walletType, setWalletType] = useState<'metamask' | 'phantom' | 'injected' | null>(null)
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState<boolean>(false)
-  const [walletError, setWalletError] = useState<string | null>(null)
+  const { address: connectedWallet, isConnected } = useAccount()
 
   // 5-Minute Countdown Timer (300 seconds)
   const [secondsRemaining, setSecondsRemaining] = useState<number>(274)
@@ -119,7 +116,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   // Creator Wallet State
   const DEFAULT_CREATOR = '0x9598...9349'
   const [customWalletInput, setCustomWalletInput] = useState<string>('')
-  const activeCreatorWallet = walletAccount || (customWalletInput || DEFAULT_CREATOR)
+  const activeCreatorWallet = (isConnected && connectedWallet) ? connectedWallet : (customWalletInput || DEFAULT_CREATOR)
 
   // Live RPC Data
   const [caSynced, setCaSynced] = useState(false)
@@ -130,112 +127,6 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
 
   // Execution History: Real events only
   const [history, setHistory] = useState<DcaExecutionEvent[]>([])
-
-  // =========================================================================
-  // REAL WEB3 WALLET CONNECTION (MetaMask + Phantom + Robinhood Chain Switch)
-  // =========================================================================
-
-  // Ensure wallet is switched to Robinhood Chain (ID: 4663)
-  const ensureRobinhoodChain = async (providerObj: any) => {
-    try {
-      await providerObj.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: ROBINHOOD_CHAIN_ID_HEX }],
-      })
-    } catch (switchError: any) {
-      if (switchError.code === 4902 || switchError?.data?.originalError?.code === 4902) {
-        await providerObj.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: ROBINHOOD_CHAIN_ID_HEX,
-              chainName: 'Robinhood Chain',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: [ROBINHOOD_RPC_URL],
-              blockExplorerUrls: [BLOCKSCOUT_URL],
-            },
-          ],
-        })
-      }
-    }
-  }
-
-  // Connect MetaMask Directly
-  const connectMetaMask = async () => {
-    setWalletError(null)
-    const eth = (window as any).ethereum
-    if (!eth) {
-      setWalletError('MetaMask not detected. Please install MetaMask extension from metamask.io')
-      return
-    }
-
-    try {
-      const provider = new ethers.BrowserProvider(eth)
-      const accounts = await provider.send('eth_requestAccounts', [])
-      if (!accounts || accounts.length === 0) {
-        setWalletError('No account selected in MetaMask.')
-        return
-      }
-
-      await ensureRobinhoodChain(eth)
-      const signer = await provider.getSigner()
-      const address = await signer.getAddress()
-
-      setWalletAccount(address)
-      setWalletType('metamask')
-      setIsWalletModalOpen(false)
-
-      eth.on('accountsChanged', (accs: string[]) => {
-        if (accs.length > 0) setWalletAccount(accs[0])
-        else disconnectWallet()
-      })
-      eth.on('chainChanged', () => window.location.reload())
-    } catch (err: any) {
-      console.error('MetaMask connect failed:', err)
-      setWalletError(err.message || 'MetaMask connection rejected')
-    }
-  }
-
-  // Connect Phantom Directly
-  const connectPhantom = async () => {
-    setWalletError(null)
-    const phantom = (window as any).phantom?.ethereum || (window as any).ethereum
-    if (!phantom) {
-      setWalletError('Phantom Wallet not detected. Please install Phantom extension from phantom.app')
-      return
-    }
-
-    try {
-      const provider = new ethers.BrowserProvider(phantom)
-      const accounts = await provider.send('eth_requestAccounts', [])
-      if (!accounts || accounts.length === 0) {
-        setWalletError('No account selected in Phantom.')
-        return
-      }
-
-      await ensureRobinhoodChain(phantom)
-      const signer = await provider.getSigner()
-      const address = await signer.getAddress()
-
-      setWalletAccount(address)
-      setWalletType('phantom')
-      setIsWalletModalOpen(false)
-
-      phantom.on('accountsChanged', (accs: string[]) => {
-        if (accs.length > 0) setWalletAccount(accs[0])
-        else disconnectWallet()
-      })
-    } catch (err: any) {
-      console.error('Phantom connect failed:', err)
-      setWalletError(err.message || 'Phantom connection rejected')
-    }
-  }
-
-  const disconnectWallet = () => {
-    setWalletAccount(null)
-    setWalletType(null)
-    setWalletError(null)
-  }
 
   // =========================================================================
   // 1. Fetch Live Stock & ETH Prices from Backend API
@@ -341,7 +232,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
         })
 
         // Check Claimable Fees for Connected Wallet or Active Creator
-        const targetAddress = walletAccount || customWalletInput
+        const targetAddress = (isConnected && connectedWallet) ? connectedWallet : customWalletInput
         if (targetAddress && targetAddress.startsWith('0x') && targetAddress.length === 42) {
           const padded = targetAddress.slice(2).toLowerCase().padStart(64, '0')
           const balOfRes = await fetch(ROBINHOOD_RPC_URL, {
@@ -373,7 +264,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
     fetchOnChainData()
     const rpcInterval = setInterval(fetchOnChainData, 15000)
     return () => clearInterval(rpcInterval)
-  }, [walletAccount, customWalletInput])
+  }, [isConnected, connectedWallet, customWalletInput])
 
   // =========================================================================
   // 3. Cadence Countdown Timer (300 seconds / 5 minutes)
@@ -475,109 +366,9 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
             <div className="text-xs font-mono text-[#00C805] font-bold">IN {formatTime(secondsRemaining)}</div>
           </div>
 
-          {walletAccount ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 border border-[#00C805]/40 font-mono text-xs">
-                <span className="w-2 h-2 rounded-full bg-[#00C805] animate-ping"></span>
-                <span className="text-white font-bold">
-                  {walletAccount.slice(0, 6)}...{walletAccount.slice(-4)}
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00C805]/10 text-[#00C805] uppercase">
-                  {walletType}
-                </span>
-              </div>
-              <button
-                onClick={disconnectWallet}
-                className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 font-mono text-xs transition-colors"
-                title="Disconnect Wallet"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsWalletModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#00C805] to-[#009e04] hover:from-[#00e606] hover:to-[#00b805] text-black font-mono font-bold text-xs transition-all shadow-[0_0_15px_rgba(0,200,5,0.25)] flex items-center gap-2"
-            >
-              <span>🦊</span> Connect Web3 Wallet
-            </button>
-          )}
+          <ConnectButton chainStatus="icon" showBalance={false} />
         </div>
       </header>
-
-      {/* REAL WEB3 WALLET MODAL (MetaMask & Phantom) */}
-      {isWalletModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#080d14] border border-[#00C805]/30 p-6 space-y-5 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">⚡</span>
-                <h3 className="font-mono text-sm font-bold text-white">Connect Web3 Wallet</h3>
-              </div>
-              <button
-                onClick={() => {
-                  setIsWalletModalOpen(false)
-                  setWalletError(null)
-                }}
-                className="text-gray-400 hover:text-white font-mono text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-300 font-mono leading-relaxed">
-              Select your wallet to connect to <strong className="text-emerald-400">Robinhood Chain (ID: 4663)</strong>.
-            </p>
-
-            {walletError && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs font-mono text-red-400 leading-relaxed">
-                {walletError}
-              </div>
-            )}
-
-            <div className="space-y-3 font-mono">
-              {/* MetaMask Option */}
-              <button
-                onClick={connectMetaMask}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl bg-black/60 hover:bg-[#00C805]/10 border border-white/10 hover:border-[#00C805]/50 transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xl">
-                    🦊
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-bold text-white group-hover:text-[#00C805] transition">MetaMask</div>
-                    <div className="text-[10px] text-gray-400">Connect via browser extension</div>
-                  </div>
-                </div>
-                <span className="text-xs text-[#00C805]">Connect →</span>
-              </button>
-
-              {/* Phantom Option */}
-              <button
-                onClick={connectPhantom}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl bg-black/60 hover:bg-[#8B5CF6]/10 border border-white/10 hover:border-[#8B5CF6]/50 transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xl">
-                    👻
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-bold text-white group-hover:text-[#8B5CF6] transition">Phantom Wallet</div>
-                    <div className="text-[10px] text-gray-400">Multi-chain EVM provider</div>
-                  </div>
-                </div>
-                <span className="text-xs text-[#8B5CF6]">Connect →</span>
-              </button>
-            </div>
-
-            <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-gray-500">
-              <span>Network: Robinhood Chain (4663)</span>
-              <span>100% Non-Custodial</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
         {/* Banner Section */}
@@ -711,14 +502,14 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <div className="text-[11px] font-mono text-gray-400 mb-1 flex items-center justify-between">
                   <span>CREATOR / DEVELOPER WALLET:</span>
                   <span className="text-[10px] text-emerald-400">
-                    {walletAccount ? `✓ Connected (${walletAccount.slice(0, 6)}...${walletAccount.slice(-4)})` : 'Monitoring Target Creator'}
+                    {(isConnected && connectedWallet) ? `✓ Connected (${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)})` : 'Monitoring Target Creator'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="Enter Creator Address (0x...)"
-                    value={walletAccount || (customWalletInput || DEFAULT_CREATOR)}
+                    value={(isConnected && connectedWallet) ? connectedWallet : (customWalletInput || DEFAULT_CREATOR)}
                     onChange={e => setCustomWalletInput(e.target.value)}
                     className="w-full text-xs font-mono bg-black/60 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-[#00C805]/50"
                   />
