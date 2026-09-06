@@ -503,7 +503,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               <span className="animate-spin">⚙️</span> Stock-Backed Holder Vault • Robinhood Chain (ID: 4663)
             </div>
             <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-              ROBYN Stock Vault: 10% Fee DCA Multi-Asset Treasury
+              ROBYN Stock Vault: Multi-Asset Treasury
             </h1>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-3xl">
               Exactly 10% of defined protocol fees are autonomously converted into real-world tokenized equities (NVIDIA, Apple, Tesla, Amazon). Every ROBYN token holder has a proportional, non-custodial claim against the underlying stock reserves based on the fixed 1,000,000,000 ROBYN total supply.
