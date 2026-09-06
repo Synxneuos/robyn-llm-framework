@@ -399,4 +399,26 @@ contract RobynStockVault is ReentrancyGuard, Ownable2Step {
             emit SupportedAssetAdded(stockToken);
         }
     }
+
+    // =========================================================================
+    // VAULT ETH SECURITY & EMERGENCY RESCUE (Restricted, Non-Holder)
+    // =========================================================================
+
+    event AccidentalETHRecovered(address indexed recipient, uint256 amount);
+
+    /**
+     * @notice Emergency recovery for accidental native ETH forcibly sent to the contract (e.g. via selfdestruct).
+     * @dev HARD RULE: Native ETH is NEVER distributed to ROBYN holders, is NEVER treated as a holder reward,
+     *      and is NEVER included in pro-rata Stock Vault entitlement accounting.
+     *      Only callable by contract owner (Ownable2Step).
+     * @param recipient Target address to receive the recovered ETH (e.g. Safe Treasury Wallet).
+     */
+    function emergencyRecoverAccidentalETH(address payable recipient) external onlyOwner nonReentrant {
+        require(recipient != address(0), "Zero address");
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No ETH to recover");
+        (bool success, ) = recipient.call{value: balance}("");
+        require(success, "ETH recovery failed");
+        emit AccidentalETHRecovered(recipient, balance);
+    }
 }

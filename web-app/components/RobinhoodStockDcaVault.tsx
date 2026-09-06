@@ -850,11 +850,11 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               </div>
             </div>
 
-            {/* Column 3: 10% Routing & 90% Reserve Pot */}
+            {/* Column 3: Two-Wallet Architecture (10% Stock DCA / 90% Safe Treasury) */}
             <div className="col-span-1 md:border-l md:border-white/5 md:pl-6 space-y-4">
               <div>
                 <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest text-[#00C805]">
-                  10% Stock DCA Routing Pot
+                  10% Stock DCA (Wallet B)
                 </div>
                 <div className="text-2xl font-mono text-[#00C805] font-bold tracking-tight">
                   {routingPotEth} ETH
@@ -862,13 +862,13 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <div className="text-xs font-mono text-emerald-400 mt-0.5">
                   ≈ ${routingPotUsd.toLocaleString(undefined, { minimumFractionDigits: 2 })} USDC
                 </div>
-                <div className="text-[10px] text-gray-500 mt-1">Allocated to 4-Stock Portfolio DCA</div>
+                <div className="text-[10px] text-gray-500 mt-1">Stock Relayer • Preserves ≥ 0.01 ETH reserve</div>
               </div>
 
               <div>
-                <div className="text-[10px] font-mono text-gray-400 uppercase">90% Protocol &amp; Gas Reserve</div>
+                <div className="text-[10px] font-mono text-gray-400 uppercase">90% Safe Treasury (Wallet A)</div>
                 <div className="text-xs font-mono text-gray-300">{treasuryReserveEth} ETH (${treasuryReserveUsd})</div>
-                <div className="text-[10px] text-gray-500">Autonomous relay &amp; liquidity protection</div>
+                <div className="text-[10px] text-gray-500">Safe Multi-Sig • Key outside bot authority</div>
               </div>
             </div>
           </div>
@@ -1152,23 +1152,29 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
             <span>🛡️</span> Mathematical Mechanics: How 5-Minute Stock DCA Backs Every ROBYN Token
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-300 leading-relaxed font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs text-gray-300 leading-relaxed font-mono">
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
-              <div className="text-[#00C805] font-bold">1. Pro-Rata Multi-Asset Stock Backing</div>
+              <div className="text-[#00C805] font-bold">1. Pro-Rata Multi-Asset Backing</div>
               <p className="text-gray-400 text-[11px]">
-                Tokens held by users represent a direct economic claim against all Stock Tokens stored in the Vault. The entitlement equals Vault Stock Balance × (User ROBYN / 1,000,000,000).
+                Tokens held represent a direct claim against all Stock Tokens in the Vault. Entitlement = Vault Stock Balance × (User ROBYN / 1,000,000,000).
               </p>
             </div>
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
               <div className="text-cyan-400 font-bold">2. Asset-Backed Value per ROBYN</div>
               <p className="text-gray-400 text-[11px]">
-                As the RWA Vault accumulates more NVIDIA, Apple, Tesla, and Amazon shares every 5 minutes, the total asset-backed value per ROBYN token increases strictly in proportion to treasury growth.
+                As tokenized NVDA, AAPL, TSLA, and AMZN accumulate in the Vault every 5 minutes, asset-backed value per ROBYN increases with treasury growth.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
-              <div className="text-purple-400 font-bold">3. Sustainable Institutional Assets</div>
+              <div className="text-purple-400 font-bold">3. Two-Wallet Security</div>
               <p className="text-gray-400 text-[11px]">
-                Protocol fees are permanently preserved in regulated Robinhood Chain securities (NVDA, AAPL, TSLA, AMZN) that capture enterprise productivity without relying on inflationary emissions.
+                90% fees sweep to Wallet A (Safe Treasury, key strictly isolated). 10% routes to Wallet B (Stock Relayer, preserves ≥ 0.01 ETH reserve).
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+              <div className="text-amber-400 font-bold">4. Zero ETH to Holders</div>
+              <p className="text-gray-400 text-[11px]">
+                Holders receive ONLY tokenized Robinhood Stock Tokens. Under no circumstances is native ETH distributed or claimable by holders.
               </p>
             </div>
           </div>
