@@ -27,11 +27,11 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
   const userHolderShareRatio = userTokens / TOTAL_ROBYN_SUPPLY
   const userHolderSharePct = (userTokens / TOTAL_ROBYN_SUPPLY) * 100
 
-  // Launchpad 1% Fee Economics & Exact 10% Protocol Fee to Stock DCA
+  // Launchpad 1% Fee Economics & Protocol Fee to Stock DCA
   const totalDailyTradingFeeUsd = dailyVolumeUsd * 0.01 // 1% Total Trade Fee on Launchpad
   const protocolFeeCutUsd = totalDailyTradingFeeUsd * 0.70 // 70% Protocol Gross Cut
-  const stockDcaDailyUsd = protocolFeeCutUsd * 0.10 // Exactly 10% Fee Allocated to Stock DCA
-  const protocolReserveDailyUsd = protocolFeeCutUsd * 0.90 // 90% Protocol & Gas Reserve
+  const stockDcaDailyUsd = protocolFeeCutUsd * 0.10 // Fee Allocated to Stock DCA
+  const protocolReserveDailyUsd = protocolFeeCutUsd * 0.90 // Protocol & Gas Reserve
 
   // Multi-Asset Portfolio Allocations (Daily Payout USD)
   const nvdaDailyUsd = stockDcaDailyUsd * 0.35 // 35%
@@ -72,7 +72,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
             <div className="text-[10px] font-mono text-gray-400">FEE ALLOCATION BUDGET</div>
-            <div className="text-xs font-mono text-[#00C805] font-bold">10% STOCK DCA • 90% TREASURY</div>
+            <div className="text-xs font-mono text-[#00C805] font-bold">AUTONOMOUS STOCK DCA • SAFE TREASURY</div>
           </div>
           <ConnectButton chainStatus="icon" showBalance={false} />
         </div>
@@ -91,7 +91,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
               Pro-Rata Multi-Asset Stock Vault Protocol
             </h1>
             <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
-              Mathematical calculation engine &amp; architectural specification for the Robyn OS Stock-Backed Holder Vault. Exactly 10% of defined protocol fees continuously purchase tokenized stocks (NVDA, AAPL, TSLA, AMZN). Every ROBYN holder receives a strictly proportional entitlement without locking penalties or duration multipliers.
+              Mathematical calculation engine &amp; architectural specification for the Robyn OS Stock-Backed Holder Vault. Protocol fees continuously purchase tokenized stocks (NVDA, AAPL, TSLA, AMZN). Every ROBYN holder receives a strictly proportional entitlement without locking penalties or duration multipliers.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
             </div>
             <div className="p-3.5 rounded-xl bg-black/40 border border-white/5">
               <div className="text-[11px] font-mono text-gray-400">STOCK DCA ALLOCATION</div>
-              <div className="text-base sm:text-lg font-bold text-[#00C805] font-mono mt-0.5">Exact 10.00%</div>
+              <div className="text-base sm:text-lg font-bold text-[#00C805] font-mono mt-0.5">Autonomous DCA</div>
               <div className="text-[10px] text-gray-500 mt-1">Defined protocol fee allocation</div>
             </div>
             <div className="p-3.5 rounded-xl bg-black/40 border border-white/5">
@@ -140,7 +140,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
                 : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
             }`}
           >
-            <span>📊</span> 10% Fee DCA Multi-Asset Split
+            <span>📊</span> Multi-Asset Portfolio Split
           </button>
           <button
             onClick={() => setActiveTab('contract')}
@@ -259,7 +259,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
                     <span className="text-white">${protocolFeeCutUsd.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-emerald-400 font-bold border-t border-white/5 pt-2">
-                    <span>10% Stock DCA Inflow:</span>
+                    <span>Stock DCA Inflow:</span>
                     <span>${stockDcaDailyUsd.toLocaleString()} / Day</span>
                   </div>
                 </div>
@@ -327,7 +327,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
                     <span>+${assetBackedGrowthPerTokenAnnual.toFixed(8)} USD / Year</span>
                   </div>
                   <p className="text-[10px] text-gray-400">
-                    Direct mathematical consequence of 10% fee DCA into permanent Robinhood Chain stock reserves.
+                    Direct mathematical consequence of fee DCA into permanent Robinhood Chain stock reserves.
                   </p>
                 </div>
               </div>
@@ -335,16 +335,16 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
           </div>
         )}
 
-        {/* TAB 2: 10% MULTI-ASSET SPLIT */}
+        {/* TAB 2: MULTI-ASSET SPLIT */}
         {activeTab === 'distribution' && (
           <div className="space-y-6">
             <div className="rounded-2xl bg-[#080d14] border border-white/10 p-6 space-y-6">
               <div className="border-b border-white/10 pb-4">
                 <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
-                  <span className="text-[#00C805]">📊</span> Exact 10% Stock DCA Portfolio Allocation
+                  <span className="text-[#00C805]">📊</span> Multi-Asset Stock Portfolio Allocation
                 </h3>
                 <p className="text-xs text-gray-400 font-mono mt-1">
-                  Sum = 100% of the 10% Stock DCA Budget. Integer remainder safely assigned to AMZN.
+                  Sum = 100% of Stock DCA Budget. Integer remainder safely assigned to AMZN.
                 </p>
               </div>
 
@@ -381,11 +381,11 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
                 <div className="text-[#00C805] font-bold">Fee Routing Logic:</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300 text-[11px]">
                   <div className="p-3 rounded-lg bg-white/5 border border-white/5">
-                    <span className="font-bold text-white block mb-1">10% Stock DCA Budget:</span>
-                    Autonomous Netlify keeper triggers every 300 seconds, sweeping exactly 10% of claimed fees into tokenized securities on Robinhood Chain.
+                    <span className="font-bold text-white block mb-1">Stock DCA Budget:</span>
+                    Autonomous Netlify keeper triggers every 300 seconds, sweeping claimed fees into tokenized securities on Robinhood Chain.
                   </div>
                   <div className="p-3 rounded-lg bg-white/5 border border-white/5">
-                    <span className="font-bold text-white block mb-1">90% Protocol &amp; Gas Reserve:</span>
+                    <span className="font-bold text-white block mb-1">Safe Treasury &amp; Gas Reserve:</span>
                     Reserved for protocol liquidity, autonomous relayer gas subsidization, and long-term ecosystem development.
                   </div>
                 </div>
@@ -464,7 +464,7 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
                 <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
                   <div className="text-white font-bold text-sm">Integer Remainder Safety</div>
                   <p className="text-gray-400 text-[11px] leading-relaxed">
-                    Splitting funds across 4 assets (35%, 25%, 20%, 20%) can cause 1-wei rounding loss with integer division. The autonomous daemon assigns the remainder to AMZN (`stockPurchaseBudget - nvda - aapl - tsla`), ensuring exactly 100% of the 10% fee allocation is spent.
+                    Splitting funds across 4 assets (35%, 25%, 20%, 20%) can cause 1-wei rounding loss with integer division. The autonomous daemon assigns the remainder to AMZN (`stockPurchaseBudget - nvda - aapl - tsla`), ensuring exactly 100% of the allocated budget is spent.
                   </p>
                 </div>
               </div>
@@ -472,9 +472,9 @@ export default function RobynVaultProtocol({ onBackToMain }: { onBackToMain: () 
               <div className="p-4 rounded-xl bg-black/60 border border-white/5 space-y-2">
                 <div className="text-white font-bold text-sm">Verified Python Accounting Test Suite Output:</div>
                 <div className="p-3 rounded-lg bg-black text-emerald-400 font-mono text-[11px] space-y-1">
-                  <div>✓ TEST 1: Specification Verification (Holders A 10%, B 5%, C 1%) - PASSED</div>
+                  <div>✓ TEST 1: Specification Verification (Holders Pro-Rata Distribution) - PASSED</div>
                   <div>✓ TEST 2: Double Claim Prevention (Subsequent claim yields 0) - PASSED</div>
-                  <div>✓ TEST 3: Exact 10% Protocol Fee Allocation &amp; Remainder Safety - PASSED</div>
+                  <div>✓ TEST 3: Protocol Fee Allocation &amp; Remainder Safety - PASSED</div>
                   <div>✓ TEST 4: Anti-Flash-Loan / Retroactive Capture Prevention - PASSED</div>
                   <div className="text-white pt-1">ALL TEST SUITES COMPLETED SUCCESSFULLY (4/4 PASSED)</div>
                 </div>

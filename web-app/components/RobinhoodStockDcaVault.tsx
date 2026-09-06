@@ -363,7 +363,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   }, [stocks, ethPriceUsd, creatorClaimableEth])
 
   // =========================================================================
-  // 4. Exact 10% Protocol Fee Allocation Calculations
+  // 4. Protocol Fee Allocation Calculations
   // =========================================================================
   const routingPotEth = +(creatorClaimableEth * 0.10).toFixed(6)
   const routingPotUsd = +(routingPotEth * ethPriceUsd).toFixed(2)
@@ -485,7 +485,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
         {/* Real Web3 Wallet Connect Button */}
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <div className="text-[10px] font-mono text-gray-400">NEXT 10% DCA ROTATION</div>
+            <div className="text-[10px] font-mono text-gray-400">NEXT DCA ROTATION</div>
             <div className="text-xs font-mono text-[#00C805] font-bold">IN {formatTime(secondsRemaining)}</div>
           </div>
 
@@ -506,7 +506,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               ROBYN Stock Vault: Multi-Asset Treasury
             </h1>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-3xl">
-              Exactly 10% of defined protocol fees are autonomously converted into real-world tokenized equities (NVIDIA, Apple, Tesla, Amazon). Every ROBYN token holder has a proportional, non-custodial claim against the underlying stock reserves based on the fixed 1,000,000,000 ROBYN total supply.
+              Protocol fees are autonomously converted into real-world tokenized equities (NVIDIA, Apple, Tesla, Amazon). Every ROBYN token holder has a proportional, non-custodial claim against the underlying stock reserves based on the fixed 1,000,000,000 ROBYN total supply.
             </p>
           </div>
 
@@ -524,14 +524,14 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               </div>
             </div>
 
-            {/* Metric 2: 10% Fee Stock DCA Pot */}
+            {/* Metric 2: Stock DCA Pot */}
             <div className="p-4 rounded-xl bg-black/60 border border-white/10">
-              <div className="text-[11px] font-mono text-gray-400">10% STOCK DCA POT</div>
+              <div className="text-[11px] font-mono text-gray-400">STOCK DCA POT</div>
               <div className="text-2xl sm:text-3xl font-bold text-white font-mono mt-1">
                 ${routingPotUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="text-[10px] text-emerald-400 mt-1 font-mono">
-                {routingPotEth} ETH (10% Fee Budget)
+                {routingPotEth} ETH (DCA Budget)
               </div>
             </div>
 
@@ -850,11 +850,11 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               </div>
             </div>
 
-            {/* Column 3: Two-Wallet Architecture (10% Stock DCA / 90% Safe Treasury) */}
+            {/* Column 3: Two-Wallet Architecture (Stock DCA / Safe Treasury) */}
             <div className="col-span-1 md:border-l md:border-white/5 md:pl-6 space-y-4">
               <div>
                 <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest text-[#00C805]">
-                  10% Stock DCA (Wallet B)
+                  Stock DCA (Wallet B)
                 </div>
                 <div className="text-2xl font-mono text-[#00C805] font-bold tracking-tight">
                   {routingPotEth} ETH
@@ -866,7 +866,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               </div>
 
               <div>
-                <div className="text-[10px] font-mono text-gray-400 uppercase">90% Safe Treasury (Wallet A)</div>
+                <div className="text-[10px] font-mono text-gray-400 uppercase">Safe Treasury (Wallet A)</div>
                 <div className="text-xs font-mono text-gray-300">{treasuryReserveEth} ETH (${treasuryReserveUsd})</div>
                 <div className="text-[10px] text-gray-500">Safe Multi-Sig • Key outside bot authority</div>
               </div>
@@ -882,7 +882,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <span className="text-[#00C805]">01.</span> Live 5-Minute Buyback Execution Ledger &amp; Pipeline
               </h2>
               <p className="text-xs text-gray-400">
-                Visualized real-time autonomous order routing: Exactly 10% of fees are swept into tokenized equities every 300 seconds.
+                Visualized real-time autonomous order routing: Protocol fees are swept into tokenized equities every 300 seconds.
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
@@ -915,17 +915,17 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <div className="text-[10px] text-gray-500">Pons Launchpad Escrow</div>
               </div>
 
-              {/* Node 2: 10% DCA Pot */}
+              {/* Node 2: DCA Pot */}
               <div className="p-3.5 rounded-xl bg-black/60 border border-white/10 flex flex-col justify-between space-y-2 relative group hover:border-cyan-400 transition">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-gray-400">STAGE 02</span>
-                  <span className="text-cyan-400">10%</span>
+                  <span className="text-cyan-400">DCA</span>
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white">Routing Engine</div>
                   <div className="text-[11px] text-cyan-400 font-bold mt-0.5">${routingPotUsd.toFixed(2)} USDC</div>
                 </div>
-                <div className="text-[10px] text-gray-500">Exact 10% DCA Allocation</div>
+                <div className="text-[10px] text-gray-500">Autonomous DCA Allocation</div>
               </div>
 
               {/* Node 3: DEX Swap */}
@@ -1130,7 +1130,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                     <div className="text-xs font-bold text-[#00C805] mt-0.5">{activeQueueStock.symbol} (${(routingPotUsd * (activeQueueStock.targetAllocPct / 100)).toFixed(2)})</div>
                   </div>
                   <div className="p-3 rounded-lg bg-black/40 border border-white/5">
-                    <div className="text-[10px] text-gray-500">10% DCA POT</div>
+                    <div className="text-[10px] text-gray-500">DCA POT</div>
                     <div className="text-xs font-bold text-white mt-0.5">${routingPotUsd.toFixed(2)} USDC</div>
                   </div>
                   <div className="p-3 rounded-lg bg-black/40 border border-white/5">
@@ -1168,7 +1168,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
               <div className="text-purple-400 font-bold">3. Two-Wallet Security</div>
               <p className="text-gray-400 text-[11px]">
-                90% fees sweep to Wallet A (Safe Treasury, key strictly isolated). 10% routes to Wallet B (Stock Relayer, preserves ≥ 0.01 ETH reserve).
+                Fees sweep to Wallet A (Safe Treasury, key strictly isolated) and route to Wallet B (Stock Relayer, preserves ≥ 0.01 ETH reserve).
               </p>
             </div>
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
