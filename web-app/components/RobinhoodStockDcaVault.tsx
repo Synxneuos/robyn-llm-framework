@@ -101,9 +101,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   // 5-Minute Countdown Timer (300 seconds)
   const [secondsRemaining, setSecondsRemaining] = useState<number>(274)
   const [currentEpoch, setCurrentEpoch] = useState<number>(1)
-  const [isExecuting, setIsExecuting] = useState<boolean>(false)
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
-  const [executionMessage, setExecutionMessage] = useState<string | null>(null)
 
   // Real Market Data State
   const [stocks, setStocks] = useState<StockAsset[]>(INITIAL_TOKENIZED_STOCKS)
@@ -290,27 +288,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   const totalCirculatingTokens = 42000000
   const floorPricePerTokenUsd = totalRwaVaultValueUsd > 0 ? totalRwaVaultValueUsd / totalCirculatingTokens : 0
 
-  // Real Trigger Handler
-  const handleTriggerBuyback = async () => {
-    setIsExecuting(true)
-    setExecutionMessage('Pinging Robinhood Chain RPC & Netlify Daemon...')
 
-    try {
-      // Simulate live check on Netlify daemon
-      await new Promise(r => setTimeout(r, 1500))
-
-      if (!isConnected) {
-        setExecutionMessage('Connect your developer wallet (0x9598...9349) to execute on-chain claim & swap.')
-      } else {
-        setExecutionMessage(`Connected as ${connectedWallet?.slice(0, 6)}...${connectedWallet?.slice(-4)}. Ready to execute via Robinhood Chain RPC.`)
-      }
-    } catch (e: any) {
-      setExecutionMessage(`Execution Error: ${e.message || 'RPC Error'}`)
-    } finally {
-      setIsExecuting(false)
-      setTimeout(() => setExecutionMessage(null), 6000)
-    }
-  }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -541,41 +519,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           </div>
         </div>
 
-        {/* Action / Trigger Section */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-[#080d14] border border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#00C805]/10 border border-[#00C805]/30 flex items-center justify-center text-[#00C805] text-lg font-bold">
-              ⚡
-            </div>
-            <div>
-              <div className="text-sm font-bold text-white font-mono">Autonomous Execution Engine</div>
-              <div className="text-xs text-gray-400">
-                Daemon runs every 300 seconds via Netlify Scheduled Functions (Cron). Connect wallet to sign manual claim.
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={handleTriggerBuyback}
-            disabled={isExecuting}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00C805] to-[#009e04] hover:from-[#00e606] hover:to-[#00b805] text-black font-mono font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(0,200,5,0.3)] flex items-center gap-2"
-          >
-            {isExecuting ? (
-              <>
-                <span className="animate-spin">🔄</span> Verifying Daemon &amp; RPC...
-              </>
-            ) : (
-              <>
-                <span>🚀</span> Trigger 5-Min Buyback Cycle
-              </>
-            )}
-          </button>
-        </div>
 
-        {executionMessage && (
-          <div className="p-3 rounded-xl bg-[#00C805]/10 border border-[#00C805]/30 text-xs font-mono text-emerald-400 animate-fade-in">
-            {executionMessage}
-          </div>
-        )}
 
         {/* SECTION 01: REAL TOKENIZED STOCKS WITH LIVE MARKET FEEDS */}
         <div className="space-y-4">
