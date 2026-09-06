@@ -667,7 +667,13 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               <div>
                 <div className="text-[11px] font-mono text-gray-400 mb-1">TARGET TOKEN CONTRACT ({tokenMeta.symbol})</div>
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-black/60 border border-white/10">
-                  <code className="text-xs font-mono text-gray-300 break-all select-all">{TOKEN_CA}</code>
+                  <code className="text-xs font-mono text-gray-300 break-all flex-1 select-all">{TOKEN_CA}</code>
+                  <button
+                    onClick={() => copyToClipboard(TOKEN_CA)}
+                    className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-white font-mono text-[10px] whitespace-nowrap transition-colors"
+                  >
+                    {copiedAddress === TOKEN_CA ? '✓ Copied' : '📋 Copy'}
+                  </button>
                   <a
                     href={`https://robinhoodchain.blockscout.com/token/${TOKEN_CA}`}
                     target="_blank"
@@ -682,7 +688,13 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               <div>
                 <div className="text-[11px] font-mono text-gray-400 mb-1">PONS V2 FEE ESCROW CONTRACT</div>
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-black/60 border border-emerald-500/20">
-                  <code className="text-xs font-mono text-emerald-400 break-all select-all">{FEE_ESCROW}</code>
+                  <code className="text-xs font-mono text-emerald-400 break-all flex-1 select-all">{FEE_ESCROW}</code>
+                  <button
+                    onClick={() => copyToClipboard(FEE_ESCROW)}
+                    className="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-mono text-[10px] whitespace-nowrap transition-colors"
+                  >
+                    {copiedAddress === FEE_ESCROW ? '✓ Copied' : '📋 Copy'}
+                  </button>
                   <a
                     href={`https://robinhoodchain.blockscout.com/address/${FEE_ESCROW}`}
                     target="_blank"
@@ -766,114 +778,12 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           </div>
         </div>
 
-        {/* SECTION 01: REAL TOKENIZED STOCKS WITH LIVE MARKET FEEDS */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-white font-mono flex items-center gap-2">
-                <span className="text-[#00C805]">01.</span> Robinhood Stock Assets &amp; Live Market Feeds
-              </h2>
-              <p className="text-xs text-gray-400">
-                Official EVM token contracts deployed on Robinhood Chain with real-time equity market pricing.
-              </p>
-            </div>
-            <span className="text-xs font-mono text-[#00C805] bg-[#00C805]/10 px-2.5 py-1 rounded border border-[#00C805]/30">
-              Live Equities Feed
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {stocks.map(stock => (
-              <div
-                key={stock.symbol}
-                className="rounded-2xl bg-[#080d14] border border-white/10 hover:border-[#00C805]/40 transition-all p-5 space-y-4 relative overflow-hidden group"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center text-lg font-mono font-bold text-[#00C805]">
-                      {stock.robinhoodTicker}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-bold text-white font-mono">{stock.name}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-gray-300">
-                          {stock.symbol}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-400 font-mono mt-0.5 flex items-center gap-2">
-                        <span>Robinhood Ticker: <strong className="text-white">${stock.robinhoodTicker}</strong></span>
-                        <span>•</span>
-                        <span className="text-cyan-400">{stock.chain}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-lg font-bold font-mono text-white">${stock.priceUsd.toFixed(2)}</div>
-                    <div className={`text-xs font-mono ${stock.change24h >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {stock.change24h >= 0 ? '+' : ''}{stock.change24h}% (24h)
-                    </div>
-                  </div>
-                </div>
-
-                {/* Holdings & Target Allocation */}
-                <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-black/40 border border-white/5 font-mono text-xs">
-                  <div>
-                    <div className="text-[10px] text-gray-400">VAULT HOLDINGS</div>
-                    <div className="text-white font-bold mt-0.5">{stock.holdingUnits.toFixed(2)} Shares</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-400">TOTAL VALUE</div>
-                    <div className="text-emerald-400 font-bold mt-0.5">${stock.totalValueUsd.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-400">TARGET ALLOC</div>
-                    <div className="text-cyan-400 font-bold mt-0.5">{stock.targetAllocPct}% of Fee Pot</div>
-                  </div>
-                </div>
-
-                {/* Contract Address Section */}
-                <div className="space-y-1.5 pt-2 border-t border-white/5">
-                  <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-gray-400">Token Contract Address (CA):</span>
-                    <span className="text-[10px] text-gray-500">{stock.issuer}</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-black/60 border border-white/10">
-                    <code className="text-[11px] font-mono text-[#00C805] break-all flex-1 select-all">
-                      {stock.ca}
-                    </code>
-                    <button
-                      onClick={() => copyToClipboard(stock.ca)}
-                      className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] transition-all flex items-center gap-1 shrink-0"
-                      title="Copy Contract Address"
-                    >
-                      {copiedAddress === stock.ca ? (
-                        <span className="text-emerald-400 font-bold">✓ Copied</span>
-                      ) : (
-                        <span>📋 Copy CA</span>
-                      )}
-                    </button>
-                    <a
-                      href={stock.explorerUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded bg-[#00C805]/15 hover:bg-[#00C805]/30 text-[#00C805] font-mono text-[11px] transition-all flex items-center gap-1 shrink-0"
-                    >
-                      ↗ Explorer
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* SECTION 02: ANIMATED 5-MINUTE BUYBACK PIPELINE & EXECUTION LEDGER */}
+        {/* SECTION 01: ANIMATED 5-MINUTE BUYBACK PIPELINE & EXECUTION LEDGER */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-white font-mono flex items-center gap-2">
-                <span className="text-[#00C805]">02.</span> Live 5-Minute Buyback Execution Ledger &amp; Pipeline
+                <span className="text-[#00C805]">01.</span> Live 5-Minute Buyback Execution Ledger &amp; Pipeline
               </h2>
               <p className="text-xs text-gray-400">
                 Visualized real-time autonomous order routing: Fees are swept from Pons Launchpad into tokenized equities every 300 seconds.
@@ -1141,7 +1051,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           </div>
         </div>
 
-        {/* SECTION 03: ARCHITECTURAL FLOW EXPLAINER (Cleaned, No 'Token Dump' references) */}
+        {/* SECTION 02: ARCHITECTURAL FLOW EXPLAINER (Cleaned, No 'Token Dump' references) */}
         <div className="rounded-2xl bg-gradient-to-r from-[#060b12] to-[#04070a] border border-[#00C805]/20 p-6 space-y-4">
           <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
             <span>🛡️</span> Mathematical Mechanics: How 5-Minute Stock DCA Creates Permanent Floor Price Growth
