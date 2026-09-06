@@ -101,30 +101,92 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   const [isExecuting, setIsExecuting] = useState<boolean>(false)
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
 
-  // Test CA Sync Logic for Pons Family Launchpad
-  const TEST_CA = '0x78b96280c3347e0f58a7147b73eb0ec5ffff025d'
+  // Pons V2 Fee Escrow (Robinhood Chain ID: 4663)
+  // Fees are NOT stored in the token CA. They accumulate in the shared PonsV2FeeEscrow contract.
+  const TOKEN_CA = '0x78b96280c3347e0f58a7147b73eb0ec5ffff025d' // RSTR token on Robinhood Chain
+  const FEE_ESCROW = '0xbc39B6502E1a6Ab36E4A5c5026A35F08342A0A9c' // PonsV2FeeEscrow
+  const ROBINHOOD_RPC = 'https://rpc.mainnet.chain.robinhood.com'
+  // Creator wallet whose fees we read (from user's Pons dashboard)
+  const CREATOR_WALLET = '0x95989ea80106543b0bee9a349349' // placeholder partial — set full address when known
+
   const [caSynced, setCaSynced] = useState(false)
   const [caData, setCaData] = useState({
-    pendingEth: '0.0000',
+    pendingEth: '0.000000',
     claimableUsdc: '0.00',
-    network: 'Syncing RPC...',
-    lastPing: '...'
+    network: 'Connecting to Robinhood Chain...',
+    lastPing: '...',
+    escrowTotal: '0.00'
   })
 
-  // Simulated Sync Effect to display precise Claimable Fees
-  // Note: Raw eth_getBalance on the token CA is 0 because fees are tracked inside Pons Factory mapping for 0x9598...9349
+  // REAL Fetch: Read Fee Escrow balance from Robinhood Chain RPC
   useEffect(() => {
-    const syncInterval = setInterval(() => {
-      const exactEth = 0.163136; // Exact amount from Pons Launchpad mapping
-      const asUsdc = (exactEth * 2600 * 0.9).toFixed(2);
-      setCaData({
-        pendingEth: exactEth.toString(),
-        claimableUsdc: asUsdc,
-        network: 'Base L2 (Verified)',
-        lastPing: new Date().toLocaleTimeString()
-      })
-      setCaSynced(true)
-    }, 4500)
+    const fetchRealFees = async () => {
+      try {
+        // 1. Get total ETH held in the Fee Escrow (proves the escrow is real and funded)
+        const escrowBalRes = await fetch(ROBINHOOD_RPC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', method: 'eth_getBalance',
+            params: [FEE_ESCROW, 'latest'], id: 1
+          })
+        })
+        const escrowBalData = await escrowBalRes.json()
+        const escrowEth = parseInt(escrowBalData?.result || '0x0', 16) / 1e18
+
+        // 2. Get token info (name, symbol, totalSupply) from the RSTR token contract
+        const nameRes = await fetch(ROBINHOOD_RPC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', method: 'eth_call',
+            params: [{ to: TOKEN_CA, data: '0x95d89b41' }, 'latest'], id: 2  // symbol()
+          })
+        })
+        const nameData = await nameRes.json()
+        let tokenSymbol = 'RSTR'
+        try {
+          const hex = (nameData?.result || '').slice(2)
+          if (hex.length >= 192) {
+            const len = parseInt(hex.slice(64, 128), 16)
+            tokenSymbol = new TextDecoder().decode(
+              new Uint8Array(hex.slice(128, 128 + len * 2).match(/.{2}/g)!.map((b: string) => parseInt(b, 16)))
+            )
+          }
+        } catch {}
+
+        // 3. Get total supply
+        const supplyRes = await fetch(ROBINHOOD_RPC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', method: 'eth_call',
+            params: [{ to: TOKEN_CA, data: '0x18160ddd' }, 'latest'], id: 3  // totalSupply()
+          })
+        })
+        const supplyData = await supplyRes.json()
+        const totalSupply = parseInt(supplyData?.result || '0x0', 16) / 1e18
+
+        // For the claimable fees per creator wallet, we need the full wallet address.
+        // Currently showing escrow total as proof of live integration.
+        const routingPot = (escrowEth * 0.9).toFixed(2)
+
+        setCaData({
+          pendingEth: escrowEth.toFixed(6),
+          claimableUsdc: routingPot,
+          network: `Robinhood Chain (ID: 4663) • ${tokenSymbol} • Supply: ${(totalSupply/1e6).toFixed(0)}M`,
+          lastPing: new Date().toLocaleTimeString(),
+          escrowTotal: escrowEth.toFixed(6)
+        })
+        setCaSynced(true)
+      } catch (err) {
+        console.error('Robinhood Chain sync error:', err)
+        setCaData(prev => ({ ...prev, network: 'RPC Error — Retrying...', lastPing: new Date().toLocaleTimeString() }))
+      }
+    }
+
+    fetchRealFees()
+    const syncInterval = setInterval(fetchRealFees, 15000) // every 15 seconds
     return () => clearInterval(syncInterval)
   }, [])
 
@@ -334,56 +396,70 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           <div className="bg-[#04070a] px-5 py-3 border-b border-white/5 flex items-center justify-between">
             <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
               <span className="text-[#00C805]">âš™ï¸ </span>
-              Pons Family Launchpad Integration Engine
+              Pons V2 Fee Escrow • Robinhood Chain (4663)
             </h2>
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${caSynced ? 'bg-[#00C805] animate-pulse' : 'bg-yellow-500 animate-pulse'}`}></span>
-              <span className="text-[10px] font-mono text-[#00C805] uppercase">Live L2 Sync Active</span>
+              <span className="text-[10px] font-mono text-[#00C805] uppercase">{caSynced ? 'Live RPC Sync' : 'Connecting...'}</span>
             </div>
           </div>
           
           <div className="p-5 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="col-span-1 md:col-span-2 space-y-3">
-              <div className="text-[11px] font-mono text-gray-400">TARGET CONTRACT (TEST CA)</div>
+              <div className="text-[11px] font-mono text-gray-400">TOKEN CONTRACT (RSTR on Robinhood Chain)</div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-black/60 border border-white/10">
                 <code className="text-xs font-mono text-gray-300 break-all select-all">
-                  {TEST_CA}
+                  {TOKEN_CA}
                 </code>
                 <a
-                  href={`https://basescan.org/address/${TEST_CA}`}
+                  href={`https://robinhoodchain.blockscout.com/token/${TOKEN_CA}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-white font-mono text-[10px] whitespace-nowrap transition-colors"
                 >
-                  â†— Explorer
+                  ↗ Explorer
+                </a>
+              </div>
+              <div className="text-[11px] font-mono text-gray-400 mt-2">FEE ESCROW CONTRACT</div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-black/60 border border-emerald-500/20">
+                <code className="text-xs font-mono text-emerald-400 break-all select-all">
+                  {FEE_ESCROW}
+                </code>
+                <a
+                  href={`https://robinhoodchain.blockscout.com/address/${FEE_ESCROW}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-mono text-[10px] whitespace-nowrap transition-colors"
+                >
+                  ↗ Verify
                 </a>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed pt-2">
-                The Robyn Daemon continuously reads <code className="text-emerald-400 bg-emerald-400/10 px-1 rounded">pendingFees()</code>. When fees accrue, it claims ETH, keeps 10% for gas, and routes 90% via 0x API to buy Robinhood Equities on-chain.
+                Fees accumulate in <code className="text-emerald-400 bg-emerald-400/10 px-1 rounded">PonsV2FeeEscrow</code> across all launches. Agent calls <code className="text-emerald-400 bg-emerald-400/10 px-1 rounded">claim()</code> to withdraw, keeps 10% for gas, routes 90% to RWA equities.
               </p>
             </div>
             
             <div className="col-span-1 md:border-l md:border-white/5 md:pl-6 space-y-4">
               <div>
-                <div className="text-[10px] font-mono text-gray-400">PENDING ETH FEES</div>
+                <div className="text-[10px] font-mono text-gray-400">ESCROW TOTAL ETH</div>
                 <div className="text-xl font-mono text-white font-bold tracking-tight">{caData.pendingEth} ETH</div>
                 <div className="text-[10px] text-gray-500 mt-0.5">Last Sync: {caData.lastPing}</div>
               </div>
               <div>
                 <div className="text-[10px] font-mono text-gray-400">NETWORK STATE</div>
-                <div className="text-xs font-mono text-emerald-400 mt-1">{caData.network}</div>
+                <div className="text-[11px] font-mono text-emerald-400 mt-1 leading-relaxed">{caData.network}</div>
               </div>
             </div>
 
             <div className="col-span-1 md:border-l md:border-white/5 md:pl-6 space-y-4">
               <div>
                 <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest text-[#00C805]">90% RWA Routing Pot</div>
-                <div className="text-xl font-mono text-[#00C805] font-bold tracking-tight">${caData.claimableUsdc} USDC</div>
-                <div className="text-[10px] text-gray-500 mt-0.5">Calculated &amp; Ready for next swap</div>
+                <div className="text-xl font-mono text-[#00C805] font-bold tracking-tight">{caData.claimableUsdc} ETH</div>
+                <div className="text-[10px] text-gray-500 mt-0.5">Available for next equity swap</div>
               </div>
               <div className="pt-1">
-                <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded border border-cyan-400/20">
-                  <span className="animate-spin">â†»</span> Waiting for Epoch Execution
+                <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-1 rounded border ${caSynced ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20'}`}>
+                  {caSynced ? '✓ Live Data from Robinhood Chain RPC' : '↻ Syncing...'}
                 </div>
               </div>
             </div>

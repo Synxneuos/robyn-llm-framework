@@ -2,22 +2,22 @@
 import { schedule } from "@netlify/functions";
 import { ethers } from "ethers";
 
-// ABI placeholder for the Pons Factory/Launchpad claim function
-const PONS_FACTORY_ABI = [
-  "function claimFees() external",
-  "function getClaimableFees(address agent) external view returns (uint256)"
+// Correct ABI: PonsV2FeeEscrow on Robinhood Chain (ID: 4663)
+const PONS_FEE_ESCROW_ABI = [
+  "function balanceOf(address recipient) external view returns (uint256)",
+  "function claim() external returns (uint256)",
+  "event Claimed(address indexed recipient, uint256 amount)"
 ];
 
-const PONS_CONTRACT_ADDRESS = "0x78b96280c3347e0f58a7147b73eb0ec5ffff025d"; 
-const DEX_ROUTER_ADDRESS = "0xdef1c0ded9bec7f1a1670819833240f027b25eff"; // 0x Exchange Proxy
+const PONS_FEE_ESCROW_ADDRESS = "0xbc39B6502E1a6Ab36E4A5c5026A35F08342A0A9c";
 
 // The handler runs every 5 minutes automatically on Netlify servers
 export const handler = schedule("*/5 * * * *", async (event) => {
   console.log("Robyn Autonomous Agent Waking Up...");
 
-  // 1. Secure Environment Variables (Never sent to the frontend)
+  // 1. Secure Environment Variables (Never sent to the frontend, never visible in F12)
   const PRIVATE_KEY = process.env.AGENT_PRIVATE_KEY;
-  const RPC_URL = process.env.RPC_URL || "https://mainnet.base.org";
+  const RPC_URL = process.env.ROBINHOOD_RPC_URL || "https://rpc.mainnet.chain.robinhood.com";
 
   if (!PRIVATE_KEY) {
     console.error("FATAL: AGENT_PRIVATE_KEY missing from Netlify Environment Variables.");
@@ -25,32 +25,32 @@ export const handler = schedule("*/5 * * * *", async (event) => {
   }
 
   try {
-    // 2. Setup Blockchain Connection
+    // 2. Setup Robinhood Chain Connection
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const agentWallet = new ethers.Wallet(PRIVATE_KEY, provider);
     console.log(`Agent Wallet Connected: ${agentWallet.address}`);
 
-    // 3. Check Pending Fees
-    const launchpadContract = new ethers.Contract(PONS_CONTRACT_ADDRESS, PONS_FACTORY_ABI, agentWallet);
-    const pendingFees = await launchpadContract.getClaimableFees(agentWallet.address);
+    // 3. Check Claimable Fees in PonsV2FeeEscrow
+    const feeEscrow = new ethers.Contract(PONS_FEE_ESCROW_ADDRESS, PONS_FEE_ESCROW_ABI, agentWallet);
+    const pendingFees = await feeEscrow.balanceOf(agentWallet.address);
     const pendingEth = ethers.formatEther(pendingFees);
-    console.log(`Pending Fees to Claim: ${pendingEth} ETH`);
+    console.log(`Pending Fees across all launches: ${pendingEth} ETH`);
 
     if (parseFloat(pendingEth) > 0.01) {
-      // 4. Claim the Fees
-      console.log("Threshold met. Executing Claim...");
-      const claimTx = await launchpadContract.claimFees();
+      // 4. Claim the Fees from Escrow
+      console.log("Threshold met. Executing claim() on PonsV2FeeEscrow...");
+      const claimTx = await feeEscrow.claim();
       await claimTx.wait();
       console.log(`Claimed successfully: ${claimTx.hash}`);
 
-      // 5. Calculate 90% for Routing
+      // 5. Calculate 90% for Routing to RWA equities
       const swapAmount = (pendingFees * 90n) / 100n;
-      console.log(`Routing ${ethers.formatEther(swapAmount)} ETH to 0x Protocol...`);
+      console.log(`Routing ${ethers.formatEther(swapAmount)} ETH to equity swap...`);
 
-      // 6. Execute 0x Swap (Mocking call to Universal Router for now)
-      console.log("Mock Swap executed to acquire Robinhood RWA equities.");
+      // 6. Execute DEX Swap (will integrate 0x/Uniswap router here)
+      console.log("Swap execution placeholder — integrate DEX router for Robinhood Chain.");
     } else {
-      console.log("Fees too low to claim. Sleeping until next epoch.");
+      console.log("Fees below 0.01 ETH threshold. Sleeping until next epoch.");
     }
 
     return { statusCode: 200, body: "Autonomous cycle complete." };
