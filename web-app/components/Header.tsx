@@ -39,6 +39,12 @@ export default function Header({ onNavigate }: HeaderProps) {
             <span className="w-1.5 h-1.5 rounded-full bg-[#00C805] animate-ping" />
             5m Stock DCA
           </a>
+          <a
+            href="#vault"
+            className="text-gray-300 hover:text-white transition flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 border border-white/10"
+          >
+            Stock Vault
+          </a>
           <button
             type="button"
             onClick={() => onNavigate('visualizer')}

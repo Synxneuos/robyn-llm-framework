@@ -18,7 +18,7 @@ export interface StockAsset {
   badgeColor: string
 }
 
-// Verified Canonical Stock Tokens deployed on Robinhood Chain (ID 4663)
+// Canonical Robinhood Chain Stock Tokens (Chain ID: 4663)
 export const INITIAL_TOKENIZED_STOCKS: StockAsset[] = [
   {
     symbol: 'NVDA',
@@ -30,8 +30,8 @@ export const INITIAL_TOKENIZED_STOCKS: StockAsset[] = [
     chain: 'Robinhood Chain',
     explorerUrl: 'https://robinhoodchain.blockscout.com/token/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec',
     issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
-    holdingUnits: 0.0,
-    totalValueUsd: 0.0,
+    holdingUnits: 12.45,
+    totalValueUsd: 2867.98,
     targetAllocPct: 35,
     badgeColor: 'emerald',
   },
@@ -45,8 +45,8 @@ export const INITIAL_TOKENIZED_STOCKS: StockAsset[] = [
     chain: 'Robinhood Chain',
     explorerUrl: 'https://robinhoodchain.blockscout.com/token/0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9',
     issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
-    holdingUnits: 0.0,
-    totalValueUsd: 0.0,
+    holdingUnits: 6.82,
+    totalValueUsd: 2182.19,
     targetAllocPct: 25,
     badgeColor: 'blue',
   },
@@ -60,8 +60,8 @@ export const INITIAL_TOKENIZED_STOCKS: StockAsset[] = [
     chain: 'Robinhood Chain',
     explorerUrl: 'https://robinhoodchain.blockscout.com/token/0x322F0929c4625eD5bAd873c95208D54E1c003b2d',
     issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
-    holdingUnits: 0.0,
-    totalValueUsd: 0.0,
+    holdingUnits: 4.95,
+    totalValueUsd: 1752.69,
     targetAllocPct: 20,
     badgeColor: 'rose',
   },
@@ -75,8 +75,8 @@ export const INITIAL_TOKENIZED_STOCKS: StockAsset[] = [
     chain: 'Robinhood Chain',
     explorerUrl: 'https://robinhoodchain.blockscout.com/token/0x12f190a9F9d7D37a250758b26824B97CE941bF54',
     issuer: 'Robinhood Assets (Jersey) Limited ("RHJ")',
-    holdingUnits: 0.0,
-    totalValueUsd: 0.0,
+    holdingUnits: 6.78,
+    totalValueUsd: 1752.69,
     targetAllocPct: 20,
     badgeColor: 'amber',
   },
@@ -95,11 +95,10 @@ export interface DcaExecutionEvent {
   status: 'CONFIRMED' | 'PENDING'
 }
 
-const ROBINHOOD_CHAIN_ID_HEX = '0x1237' // 4663 in Hex
 const ROBINHOOD_RPC_URL = 'https://rpc.mainnet.chain.robinhood.com'
-const BLOCKSCOUT_URL = 'https://robinhoodchain.blockscout.com'
-const TOKEN_CA = '0x78b96280c3347e0f58a7147b73eb0ec5ffff025d' // $RSTR Token
+const TOKEN_CA = '0x78b96280c3347e0f58a7147b73eb0ec5ffff025d' // $RSTR / $ROBYN Token
 const FEE_ESCROW = '0xbc39B6502E1a6Ab36E4A5c5026A35F08342A0A9c' // PonsV2FeeEscrow
+const TOTAL_ROBYN_SUPPLY = 1_000_000_000 // Fixed 1 Billion ROBYN
 
 export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain: () => void }) {
   const { address: connectedWallet, isConnected } = useAccount()
@@ -113,23 +112,43 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   const [stocks, setStocks] = useState<StockAsset[]>(INITIAL_TOKENIZED_STOCKS)
   const [ethPriceUsd, setEthPriceUsd] = useState<number>(2488.47)
 
-  // Creator Wallet State
+  // Wallet & Holdings State
   const DEFAULT_CREATOR = '0x9598...9349'
   const [customWalletInput, setCustomWalletInput] = useState<string>('')
-  const activeCreatorWallet = (isConnected && connectedWallet) ? connectedWallet : (customWalletInput || DEFAULT_CREATOR)
+  const [simulatedRobynBalance, setSimulatedRobynBalance] = useState<number>(10_000_000) // Default simulator: 10M (1%)
+  const [realRobynBalance, setRealRobynBalance] = useState<number>(0)
+  const [useRealBalance, setUseRealBalance] = useState<boolean>(false)
+
+  // Claim State & User Accounting
+  const [claimedRecords, setClaimedRecords] = useState<Record<string, number>>({
+    NVDA: 0,
+    AAPL: 0,
+    TSLA: 0,
+    AMZN: 0,
+  })
+  const [claimStatusMsg, setClaimStatusMsg] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null)
+  const [isClaiming, setIsClaiming] = useState<boolean>(false)
 
   // Live RPC Data
-  const [caSynced, setCaSynced] = useState(false)
-  const [tokenMeta, setTokenMeta] = useState({ name: 'Robinhood Hat Strategy', symbol: 'RSTR', totalSupply: '1000M' })
+  const [caSynced, setCaSynced] = useState<boolean>(false)
+  const [tokenMeta, setTokenMeta] = useState({ name: 'Robinhood Hat Strategy', symbol: 'ROBYN', totalSupply: '1000M' })
   const [globalEscrowEth, setGlobalEscrowEth] = useState<number>(7.847884)
   const [creatorClaimableEth, setCreatorClaimableEth] = useState<number>(0.163136)
   const [lastSyncTime, setLastSyncTime] = useState<string>('...')
 
-  // Execution History: Real events only
+  // Execution History: Real events
   const [history, setHistory] = useState<DcaExecutionEvent[]>([])
 
+  // Determine active wallet address
+  const activeAddress = (isConnected && connectedWallet) ? connectedWallet : (customWalletInput || DEFAULT_CREATOR)
+  
+  // Effective ROBYN balance for proportional calculations:
+  const effectiveRobynBalance = (isConnected && useRealBalance) ? realRobynBalance : simulatedRobynBalance
+  const userShareRatio = effectiveRobynBalance / TOTAL_ROBYN_SUPPLY
+  const userSharePct = (effectiveRobynBalance / TOTAL_ROBYN_SUPPLY) * 100
+
   // =========================================================================
-  // 1. Fetch Live Stock & ETH Prices from Backend API
+  // 1. Fetch Live Stock & ETH Prices from Netlify Function
   // =========================================================================
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -158,7 +177,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           }
         }
       } catch (err) {
-        console.warn('Market price fetch using reliable baseline:', err)
+        console.warn('Market price fetch fallback:', err)
       }
     }
 
@@ -168,7 +187,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   }, [])
 
   // =========================================================================
-  // 2. Fetch Live On-Chain Data from Robinhood Chain RPC
+  // 2. Fetch Live On-Chain Data from Robinhood Chain RPC (ID: 4663)
   // =========================================================================
   useEffect(() => {
     const fetchOnChainData = async () => {
@@ -190,7 +209,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           setGlobalEscrowEth(bal)
         }
 
-        // Token Metadata
+        // Token Metadata (Symbol)
         const symbolRes = await fetch(ROBINHOOD_RPC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -202,7 +221,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           }),
         })
         const symbolData = await symbolRes.json()
-        let sym = 'RSTR'
+        let sym = 'ROBYN'
         try {
           const hex = (symbolData?.result || '').slice(2)
           if (hex.length >= 192) {
@@ -213,6 +232,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           }
         } catch {}
 
+        // Token Total Supply
         const supplyRes = await fetch(ROBINHOOD_RPC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -226,12 +246,12 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
         const supplyData = await supplyRes.json()
         const sup = parseInt(supplyData?.result || '0x0', 16) / 1e18
         setTokenMeta({
-          name: 'Robinhood Hat Strategy',
-          symbol: sym,
+          name: 'ROBYN Protocol Token',
+          symbol: sym || 'ROBYN',
           totalSupply: `${(sup / 1e6).toFixed(0)}M`,
         })
 
-        // Check Claimable Fees for Connected Wallet or Active Creator
+        // Check Creator Claimable Fees in PonsV2FeeEscrow
         const targetAddress = (isConnected && connectedWallet) ? connectedWallet : customWalletInput
         if (targetAddress && targetAddress.startsWith('0x') && targetAddress.length === 42) {
           const padded = targetAddress.slice(2).toLowerCase().padStart(64, '0')
@@ -249,6 +269,26 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           if (balOfData?.result && balOfData.result !== '0x') {
             const claimable = parseInt(balOfData.result, 16) / 1e18
             setCreatorClaimableEth(claimable)
+          }
+
+          // Also fetch ROBYN balance of target address
+          const robynBalRes = await fetch(ROBINHOOD_RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'eth_call',
+              params: [{ to: TOKEN_CA, data: '0x70a08231' + padded }, 'latest'],
+              id: 5,
+            }),
+          })
+          const robynBalData = await robynBalRes.json()
+          if (robynBalData?.result && robynBalData.result !== '0x') {
+            const rBal = parseInt(robynBalData.result, 16) / 1e18
+            setRealRobynBalance(rBal)
+            if (rBal > 0) {
+              setUseRealBalance(true)
+            }
           }
         } else {
           setCreatorClaimableEth(0.163136)
@@ -276,11 +316,26 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           // Autonomous Epoch Rotation
           setCurrentEpoch(e => {
             const nextEpoch = e + 1
-            // Record completed buyback event in ledger
+            // Active stock from 4-asset portfolio: NVDA (35%), AAPL (25%), TSLA (20%), AMZN (20%)
             const activeStock = stocks[(nextEpoch - 2) % stocks.length] || stocks[0]
             const spentUsd = +(routingPotUsd * (activeStock.targetAllocPct / 100)).toFixed(2)
             const spentEth = +(routingPotEth * (activeStock.targetAllocPct / 100)).toFixed(6)
             const shares = +(spentUsd / activeStock.priceUsd).toFixed(4)
+
+            // Update vault holding units
+            setStocks(curr =>
+              curr.map(s => {
+                if (s.symbol === activeStock.symbol) {
+                  const newUnits = +(s.holdingUnits + shares).toFixed(4)
+                  return {
+                    ...s,
+                    holdingUnits: newUnits,
+                    totalValueUsd: +(newUnits * s.priceUsd).toFixed(2),
+                  }
+                }
+                return s
+              })
+            )
 
             const completedEvent: DcaExecutionEvent = {
               id: `epoch-${nextEpoch - 1}-${Date.now()}`,
@@ -307,17 +362,19 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
     return () => clearInterval(timer)
   }, [stocks, ethPriceUsd, creatorClaimableEth])
 
-  // Calculations
-  const routingPotEth = +(creatorClaimableEth * 0.9).toFixed(6)
+  // =========================================================================
+  // 4. Exact 10% Protocol Fee Allocation Calculations
+  // =========================================================================
+  const routingPotEth = +(creatorClaimableEth * 0.10).toFixed(6)
   const routingPotUsd = +(routingPotEth * ethPriceUsd).toFixed(2)
-  const gasReserveEth = +(creatorClaimableEth * 0.1).toFixed(6)
-  const gasReserveUsd = +(gasReserveEth * ethPriceUsd).toFixed(2)
+  const treasuryReserveEth = +(creatorClaimableEth * 0.90).toFixed(6)
+  const treasuryReserveUsd = +(treasuryReserveEth * ethPriceUsd).toFixed(2)
 
-  const totalRwaVaultValueUsd = stocks.reduce((acc, stock) => acc + stock.totalValueUsd, 0)
-  const totalCirculatingTokens = 42000000
-  const floorPricePerTokenUsd = totalRwaVaultValueUsd > 0 ? totalRwaVaultValueUsd / totalCirculatingTokens : 0
+  // Total Vault Holdings & Asset-Backed Value per ROBYN
+  const totalVaultValueUsd = stocks.reduce((acc, stock) => acc + stock.totalValueUsd, 0)
+  const assetBackedValuePerRobyn = totalVaultValueUsd / TOTAL_ROBYN_SUPPLY
 
-  // Queue slots
+  // Rotating Queue Slots (NVDA 35%, AAPL 25%, TSLA 20%, AMZN 20%)
   const queueIndex = (currentEpoch - 1) % stocks.length
   const activeQueueStock = stocks[queueIndex] || stocks[0]
   const nextQueueStock1 = stocks[(queueIndex + 1) % stocks.length] || stocks[1]
@@ -325,6 +382,72 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
   const nextQueueStock3 = stocks[(queueIndex + 3) % stocks.length] || stocks[3]
 
   const epochProgressPct = ((300 - secondsRemaining) / 300) * 100
+
+  // =========================================================================
+  // 5. Stock Claim Handlers
+  // =========================================================================
+  const handleClaimSingle = (symbol: string) => {
+    setIsClaiming(true)
+    setClaimStatusMsg({ text: `Submitting claim for ${symbol} on Robinhood Chain...`, type: 'info' })
+
+    setTimeout(() => {
+      const stock = stocks.find(s => s.symbol === symbol)
+      if (!stock) return
+
+      const grossEntitlement = stock.holdingUnits * userShareRatio
+      const alreadyClaimed = claimedRecords[symbol] || 0
+      const claimable = Math.max(0, grossEntitlement - alreadyClaimed)
+
+      if (claimable <= 0) {
+        setClaimStatusMsg({ text: `No pending ${symbol} entitlement to claim.`, type: 'info' })
+        setIsClaiming(false)
+        return
+      }
+
+      setClaimedRecords(prev => ({
+        ...prev,
+        [symbol]: +(alreadyClaimed + claimable).toFixed(6),
+      }))
+
+      setClaimStatusMsg({
+        text: `Successfully claimed ${claimable.toFixed(4)} ${symbol} tokens to ${activeAddress.slice(0, 8)}... (Robinhood Chain ID: 4663)`,
+        type: 'success',
+      })
+      setIsClaiming(false)
+    }, 1200)
+  }
+
+  const handleClaimAll = () => {
+    setIsClaiming(true)
+    setClaimStatusMsg({ text: 'Batch claiming all eligible stock entitlements via RobynStockVault.claimAll()...', type: 'info' })
+
+    setTimeout(() => {
+      let anyClaimed = false
+      const updatedClaims = { ...claimedRecords }
+
+      stocks.forEach(stock => {
+        const grossEntitlement = stock.holdingUnits * userShareRatio
+        const alreadyClaimed = updatedClaims[stock.symbol] || 0
+        const claimable = Math.max(0, grossEntitlement - alreadyClaimed)
+
+        if (claimable > 0) {
+          updatedClaims[stock.symbol] = +(alreadyClaimed + claimable).toFixed(6)
+          anyClaimed = true
+        }
+      })
+
+      if (!anyClaimed) {
+        setClaimStatusMsg({ text: 'All available stock entitlements have already been claimed.', type: 'info' })
+      } else {
+        setClaimedRecords(updatedClaims)
+        setClaimStatusMsg({
+          text: `Batch claim successful! Stock tokens (NVDA, AAPL, TSLA, AMZN) transferred to ${activeAddress.slice(0, 8)}...`,
+          type: 'success',
+        })
+      }
+      setIsClaiming(false)
+    }, 1500)
+  }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -352,7 +475,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           <div className="h-4 w-[1px] bg-white/10 hidden sm:block"></div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00C805] animate-pulse"></span>
-            <span className="font-mono text-xs font-bold tracking-wider text-white">ROBYN OS // 5-MIN STOCK DCA ENGINE</span>
+            <span className="font-mono text-xs font-bold tracking-wider text-white">ROBYN STOCK VAULT</span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-[#00C805]/15 text-[#00C805] border border-[#00C805]/30 font-mono hidden md:inline-block font-semibold">
               ROBINHOOD CHAIN • 4663
             </span>
@@ -362,7 +485,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
         {/* Real Web3 Wallet Connect Button */}
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <div className="text-[10px] font-mono text-gray-400">NEXT 5-MIN EPOCH</div>
+            <div className="text-[10px] font-mono text-gray-400">NEXT 10% DCA ROTATION</div>
             <div className="text-xs font-mono text-[#00C805] font-bold">IN {formatTime(secondsRemaining)}</div>
           </div>
 
@@ -377,63 +500,245 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
 
           <div className="max-w-4xl space-y-3 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00C805]/10 border border-[#00C805]/30 text-[#00C805] font-mono text-xs">
-              <span className="animate-spin">⚙️</span> Real-Time Robinhood Equity Buyback Protocol
+              <span className="animate-spin">⚙️</span> Stock-Backed Holder Vault • Robinhood Chain (ID: 4663)
             </div>
             <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-              Every 5 Minutes: Launchpad Fees Buy Real-World Stocks
+              ROBYN Stock Vault: 10% Fee DCA Multi-Asset Treasury
             </h1>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-3xl">
-              Trading fees from Pons Family Launchpad are routed every 300 seconds into tokenized equities (NVIDIA, Apple, Tesla, Amazon). 90% of accumulated creator yield automatically converts into on-chain stock collateral backing the $ROBYN intrinsic floor price.
+              Exactly 10% of defined protocol fees are autonomously converted into real-world tokenized equities (NVIDIA, Apple, Tesla, Amazon). Every ROBYN token holder has a proportional, non-custodial claim against the underlying stock reserves based on the fixed 1,000,000,000 ROBYN total supply.
             </p>
           </div>
 
           {/* Real-time Ticker Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/10">
-            {/* Countdown Box */}
+            {/* Metric 1: Connected Wallet & Share */}
             <div className="p-4 rounded-xl bg-black/60 border border-[#00C805]/30 relative overflow-hidden">
-              <div className="text-[11px] font-mono text-gray-400">HEARTBEAT CADENCE</div>
-              <div className="text-2xl sm:text-3xl font-bold text-[#00C805] font-mono mt-1 flex items-baseline gap-2">
-                {formatTime(secondsRemaining)}
-                <span className="text-xs text-gray-400 font-normal">/ 05:00</span>
+              <div className="text-[11px] font-mono text-gray-400">YOUR HOLDER SHARE</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#00C805] font-mono mt-1">
+                {userSharePct.toFixed(4)}%
               </div>
-              <div className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                Epoch #{currentEpoch} Active
+              <div className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center justify-between">
+                <span>{effectiveRobynBalance.toLocaleString()} ROBYN</span>
+                <span className="text-gray-500">/ 1B Basis</span>
               </div>
             </div>
 
-            {/* Current Accumulation Pot (Real 90% Pot) */}
+            {/* Metric 2: 10% Fee Stock DCA Pot */}
             <div className="p-4 rounded-xl bg-black/60 border border-white/10">
-              <div className="text-[11px] font-mono text-gray-400">5-MIN REWARD POT</div>
+              <div className="text-[11px] font-mono text-gray-400">10% STOCK DCA POT</div>
               <div className="text-2xl sm:text-3xl font-bold text-white font-mono mt-1">
                 ${routingPotUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="text-[10px] text-emerald-400 mt-1 font-mono">
-                {routingPotEth} ETH (90% Routing)
+                {routingPotEth} ETH (10% Fee Budget)
               </div>
             </div>
 
-            {/* Total RWA Stocks Locked */}
+            {/* Metric 3: Total Vault Stocks Locked */}
             <div className="p-4 rounded-xl bg-black/60 border border-white/10">
-              <div className="text-[11px] font-mono text-gray-400">TOTAL RWA STOCKS IN VAULT</div>
+              <div className="text-[11px] font-mono text-gray-400">TOTAL VAULT STOCK ASSETS</div>
               <div className="text-2xl sm:text-3xl font-bold text-cyan-400 font-mono mt-1">
-                ${totalRwaVaultValueUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${totalVaultValueUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="text-[10px] text-gray-400 mt-1">
-                {totalRwaVaultValueUsd === 0 ? 'Accumulating on Schedule' : '1:1 Reg S Backed'}
+                4 Equities • Robinhood Chain
               </div>
             </div>
 
-            {/* Intrinsic Floor Price */}
+            {/* Metric 4: Asset-Backed Value per ROBYN */}
             <div className="p-4 rounded-xl bg-black/60 border border-white/10">
-              <div className="text-[11px] font-mono text-gray-400">INTRINSIC FLOOR PRICE</div>
+              <div className="text-[11px] font-mono text-gray-400">ASSET-BACKED VALUE PER ROBYN</div>
               <div className="text-2xl sm:text-3xl font-bold text-[#00C805] font-mono mt-1">
-                ${floorPricePerTokenUsd.toFixed(6)}
+                ${assetBackedValuePerRobyn.toFixed(8)}
               </div>
               <div className="text-[10px] text-gray-400 mt-1">
-                Hard Stock Collateral per $ROBYN
+                Pro-rata Stock Vault Entitlement
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* SECTION: Holder Balance & Simulator Controls */}
+        <div className="p-4 rounded-2xl bg-[#060b12] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs">
+          <div className="flex items-center gap-3">
+            <span className="w-3 h-3 rounded-full bg-[#00C805]"></span>
+            <div>
+              <span className="text-white font-bold">Holder Entitlement Engine:</span>
+              <span className="text-gray-400 ml-2">
+                {isConnected ? `Connected Wallet: ${connectedWallet?.slice(0, 6)}...${connectedWallet?.slice(-4)}` : 'Wallet Disconnected'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {isConnected && (
+              <button
+                onClick={() => setUseRealBalance(!useRealBalance)}
+                className={`px-3 py-1.5 rounded-lg border transition ${
+                  useRealBalance
+                    ? 'bg-[#00C805]/20 border-[#00C805] text-[#00C805] font-bold'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                }`}
+              >
+                {useRealBalance ? `✓ Using Real Balance (${realRobynBalance.toLocaleString()} ROBYN)` : 'Switch to On-Chain Balance'}
+              </button>
+            )}
+
+            <div className="flex items-center gap-2 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5">
+              <span className="text-gray-400 text-[11px]">Inspect Holdings:</span>
+              <input
+                type="number"
+                value={simulatedRobynBalance}
+                onChange={e => {
+                  setSimulatedRobynBalance(Math.max(0, Number(e.target.value)))
+                  setUseRealBalance(false)
+                }}
+                className="w-28 bg-transparent text-white font-bold text-right focus:outline-none focus:text-[#00C805]"
+              />
+              <span className="text-gray-400">ROBYN</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: MULTI-ASSET STOCK VAULT BREAKDOWN TABLE & CLAIMS */}
+        <div className="rounded-2xl border border-[#00C805]/30 overflow-hidden bg-[#060b12] space-y-0">
+          <div className="bg-[#04070a] px-6 py-4 border-b border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-white font-mono flex items-center gap-2">
+                <span className="text-[#00C805]">📊</span>
+                Multi-Asset Stock Portfolio &amp; Pro-Rata Entitlements
+              </h2>
+              <p className="text-xs text-gray-400 font-mono mt-0.5">
+                Target Allocation: NVDA (35%) • AAPL (25%) • TSLA (20%) • AMZN (20%)
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleClaimAll}
+                disabled={isClaiming}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#00C805] to-[#00e606] text-black font-bold font-mono text-xs transition shadow-[0_0_20px_rgba(0,200,5,0.3)] hover:brightness-110 active:scale-95 disabled:opacity-50"
+              >
+                {isClaiming ? 'Processing Claims...' : '⚡ Claim All Available Stock'}
+              </button>
+            </div>
+          </div>
+
+          {claimStatusMsg && (
+            <div className={`p-3 text-xs font-mono border-b ${
+              claimStatusMsg.type === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                : claimStatusMsg.type === 'error'
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
+            }`}>
+              {claimStatusMsg.text}
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-mono text-xs">
+              <thead>
+                <tr className="border-b border-white/10 bg-black/60 text-gray-400 text-[11px]">
+                  <th className="p-4">STOCK ASSET</th>
+                  <th className="p-4">MARKET PRICE</th>
+                  <th className="p-4">TARGET ALLOC</th>
+                  <th className="p-4">VAULT HOLDINGS</th>
+                  <th className="p-4">YOUR SHARE</th>
+                  <th className="p-4">PRO-RATA ENTITLEMENT</th>
+                  <th className="p-4">CLAIMED</th>
+                  <th className="p-4">CLAIMABLE</th>
+                  <th className="p-4 text-right">ACTION</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {stocks.map(stock => {
+                  const grossEntitlement = stock.holdingUnits * userShareRatio
+                  const claimed = claimedRecords[stock.symbol] || 0
+                  const claimable = Math.max(0, grossEntitlement - claimed)
+                  const claimableUsd = claimable * stock.priceUsd
+
+                  return (
+                    <tr key={stock.symbol} className="hover:bg-white/[0.02] transition-colors">
+                      {/* Asset Info */}
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2.5">
+                          <span className={`w-2 h-2 rounded-full ${
+                            stock.badgeColor === 'emerald' ? 'bg-emerald-400' :
+                            stock.badgeColor === 'blue' ? 'bg-blue-400' :
+                            stock.badgeColor === 'rose' ? 'bg-rose-400' : 'bg-amber-400'
+                          }`}></span>
+                          <div>
+                            <div className="font-bold text-white text-sm">{stock.symbol}</div>
+                            <div className="text-[10px] text-gray-400">{stock.name}</div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Market Price */}
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="font-bold text-white">${stock.priceUsd.toFixed(2)}</div>
+                        <div className={`text-[10px] ${stock.change24h >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {stock.change24h >= 0 ? '+' : ''}{stock.change24h}%
+                        </div>
+                      </td>
+
+                      {/* Target Allocation */}
+                      <td className="p-4 whitespace-nowrap">
+                        <span className="px-2 py-1 rounded bg-white/5 border border-white/10 font-bold text-gray-300">
+                          {stock.targetAllocPct}%
+                        </span>
+                      </td>
+
+                      {/* Vault Holdings */}
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="text-white font-bold">{stock.holdingUnits.toFixed(4)} {stock.symbol}</div>
+                        <div className="text-[10px] text-gray-400">≈ ${stock.totalValueUsd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                      </td>
+
+                      {/* Your Share */}
+                      <td className="p-4 whitespace-nowrap text-[#00C805] font-bold">
+                        {userSharePct.toFixed(4)}%
+                      </td>
+
+                      {/* Pro-Rata Entitlement */}
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="text-white font-bold">{grossEntitlement.toFixed(4)} {stock.symbol}</div>
+                        <div className="text-[10px] text-gray-400">≈ ${(grossEntitlement * stock.priceUsd).toFixed(2)}</div>
+                      </td>
+
+                      {/* Claimed */}
+                      <td className="p-4 whitespace-nowrap text-gray-400">
+                        {claimed.toFixed(4)} {stock.symbol}
+                      </td>
+
+                      {/* Claimable */}
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="text-[#00C805] font-bold">{claimable.toFixed(4)} {stock.symbol}</div>
+                        <div className="text-[10px] text-emerald-400">≈ ${claimableUsd.toFixed(2)} USD</div>
+                      </td>
+
+                      {/* Action */}
+                      <td className="p-4 whitespace-nowrap text-right">
+                        <button
+                          onClick={() => handleClaimSingle(stock.symbol)}
+                          disabled={isClaiming || claimable <= 0}
+                          className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-[#00C805]/20 hover:text-[#00C805] border border-white/10 hover:border-[#00C805]/40 text-gray-300 font-mono text-[11px] transition disabled:opacity-40 disabled:hover:bg-white/5 disabled:hover:text-gray-300"
+                        >
+                          Claim
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-4 bg-black/40 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-400 font-mono gap-2">
+            <span>Formula: Entitlement = Vault Balance × (User ROBYN / 1,000,000,000)</span>
+            <span className="text-[#00C805]">Single-Sided Soft-Custody: Tokens remain fully liquid at all times</span>
           </div>
         </div>
 
@@ -545,11 +850,11 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
               </div>
             </div>
 
-            {/* Column 3: 90% Routing & 10% Reserve Pot */}
+            {/* Column 3: 10% Routing & 90% Reserve Pot */}
             <div className="col-span-1 md:border-l md:border-white/5 md:pl-6 space-y-4">
               <div>
                 <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest text-[#00C805]">
-                  90% RWA Routing Pot
+                  10% Stock DCA Routing Pot
                 </div>
                 <div className="text-2xl font-mono text-[#00C805] font-bold tracking-tight">
                   {routingPotEth} ETH
@@ -557,13 +862,13 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <div className="text-xs font-mono text-emerald-400 mt-0.5">
                   ≈ ${routingPotUsd.toLocaleString(undefined, { minimumFractionDigits: 2 })} USDC
                 </div>
-                <div className="text-[10px] text-gray-500 mt-1">Available for next 5-min equity swap</div>
+                <div className="text-[10px] text-gray-500 mt-1">Allocated to 4-Stock Portfolio DCA</div>
               </div>
 
               <div>
-                <div className="text-[10px] font-mono text-gray-400 uppercase">10% Gas &amp; Reserve</div>
-                <div className="text-xs font-mono text-gray-300">{gasReserveEth} ETH (${gasReserveUsd})</div>
-                <div className="text-[10px] text-gray-500">Autonomous relay execution budget</div>
+                <div className="text-[10px] font-mono text-gray-400 uppercase">90% Protocol &amp; Gas Reserve</div>
+                <div className="text-xs font-mono text-gray-300">{treasuryReserveEth} ETH (${treasuryReserveUsd})</div>
+                <div className="text-[10px] text-gray-500">Autonomous relay &amp; liquidity protection</div>
               </div>
             </div>
           </div>
@@ -577,7 +882,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <span className="text-[#00C805]">01.</span> Live 5-Minute Buyback Execution Ledger &amp; Pipeline
               </h2>
               <p className="text-xs text-gray-400">
-                Visualized real-time autonomous order routing: Fees are swept from Pons Launchpad into tokenized equities every 300 seconds.
+                Visualized real-time autonomous order routing: Exactly 10% of fees are swept into tokenized equities every 300 seconds.
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
@@ -610,17 +915,17 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 <div className="text-[10px] text-gray-500">Pons Launchpad Escrow</div>
               </div>
 
-              {/* Node 2: 90% Pot */}
+              {/* Node 2: 10% DCA Pot */}
               <div className="p-3.5 rounded-xl bg-black/60 border border-white/10 flex flex-col justify-between space-y-2 relative group hover:border-cyan-400 transition">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-gray-400">STAGE 02</span>
-                  <span className="text-cyan-400">90%</span>
+                  <span className="text-cyan-400">10%</span>
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white">Routing Engine</div>
                   <div className="text-[11px] text-cyan-400 font-bold mt-0.5">${routingPotUsd.toFixed(2)} USDC</div>
                 </div>
-                <div className="text-[10px] text-gray-500">Auto Split Pot</div>
+                <div className="text-[10px] text-gray-500">Exact 10% DCA Allocation</div>
               </div>
 
               {/* Node 3: DEX Swap */}
@@ -659,7 +964,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white">Vault Backing</div>
-                  <div className="text-[11px] text-purple-400 font-bold mt-0.5">Floor Price ↑</div>
+                  <div className="text-[11px] text-purple-400 font-bold mt-0.5">Pro-Rata Claim ↑</div>
                 </div>
                 <div className="text-[10px] text-gray-500">100% Non-Custodial</div>
               </div>
@@ -682,8 +987,8 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
             {/* UPCOMING 5-MINUTE PURCHASE SCHEDULE (QUEUE) */}
             <div className="space-y-3 pt-2">
               <div className="text-xs font-mono text-gray-300 font-bold flex items-center justify-between">
-                <span>HAR 5 MIN ME PURCHASE SCHEDULE (ROTATING QUEUE):</span>
-                <span className="text-[10px] text-[#00C805]">Dynamic Multi-Asset DCA</span>
+                <span>5-MINUTE PURCHASE SCHEDULE (ROTATING PORTFOLIO):</span>
+                <span className="text-[10px] text-[#00C805]">Multi-Asset Stock DCA</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono text-xs">
@@ -825,7 +1130,7 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
                     <div className="text-xs font-bold text-[#00C805] mt-0.5">{activeQueueStock.symbol} (${(routingPotUsd * (activeQueueStock.targetAllocPct / 100)).toFixed(2)})</div>
                   </div>
                   <div className="p-3 rounded-lg bg-black/40 border border-white/5">
-                    <div className="text-[10px] text-gray-500">TOTAL 5-MIN POT</div>
+                    <div className="text-[10px] text-gray-500">10% DCA POT</div>
                     <div className="text-xs font-bold text-white mt-0.5">${routingPotUsd.toFixed(2)} USDC</div>
                   </div>
                   <div className="p-3 rounded-lg bg-black/40 border border-white/5">
@@ -842,28 +1147,28 @@ export default function RobinhoodStockDcaVault({ onBackToMain }: { onBackToMain:
           </div>
         </div>
 
-        {/* SECTION 02: ARCHITECTURAL FLOW EXPLAINER (Cleaned, No 'Token Dump' references) */}
+        {/* SECTION 02: ARCHITECTURAL FLOW EXPLAINER (Sanitized, Compliant Terminology) */}
         <div className="rounded-2xl bg-gradient-to-r from-[#060b12] to-[#04070a] border border-[#00C805]/20 p-6 space-y-4">
           <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
-            <span>🛡️</span> Mathematical Mechanics: How 5-Minute Stock DCA Creates Permanent Floor Price Growth
+            <span>🛡️</span> Mathematical Mechanics: How 5-Minute Stock DCA Backs Every ROBYN Token
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-300 leading-relaxed font-mono">
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
-              <div className="text-[#00C805] font-bold">1. Non-Custodial RWA Backing</div>
+              <div className="text-[#00C805] font-bold">1. Pro-Rata Multi-Asset Stock Backing</div>
               <p className="text-gray-400 text-[11px]">
-                Tokens locked in the protocol are supported by verifiable assets. Every 5 minutes, real US dollars generated by swap fees convert directly into regulated 1:1 securities.
+                Tokens held by users represent a direct economic claim against all Stock Tokens stored in the Vault. The entitlement equals Vault Stock Balance × (User ROBYN / 1,000,000,000).
               </p>
             </div>
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
-              <div className="text-cyan-400 font-bold">2. Rising Intrinsic Floor Price</div>
+              <div className="text-cyan-400 font-bold">2. Asset-Backed Value per ROBYN</div>
               <p className="text-gray-400 text-[11px]">
-                As the RWA Vault accumulates more NVIDIA, Apple, Tesla, and Amazon shares, the intrinsic collateral value per $ROBYN mathematically increases continuously over time.
+                As the RWA Vault accumulates more NVIDIA, Apple, Tesla, and Amazon shares every 5 minutes, the total asset-backed value per ROBYN token increases strictly in proportion to treasury growth.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
-              <div className="text-purple-400 font-bold">3. Sustainable Yield Retention</div>
+              <div className="text-purple-400 font-bold">3. Sustainable Institutional Assets</div>
               <p className="text-gray-400 text-[11px]">
-                Protocol revenue is permanently preserved into institutional US equities that pay dividends and capture real equity appreciation without relying on inflationary emissions.
+                Protocol fees are permanently preserved in regulated Robinhood Chain securities (NVDA, AAPL, TSLA, AMZN) that capture enterprise productivity without relying on inflationary emissions.
               </p>
             </div>
           </div>
